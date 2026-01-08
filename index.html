@@ -4107,6 +4107,83 @@
             }
         }
 
+        .analytics-header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Notification Toggle Options */
+        .notify-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+        }
+
+        .notify-option-content {
+            flex: 1;
+        }
+
+        .notify-option-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .notify-option-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .notify-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .notify-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .notify-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .notify-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .notify-toggle input:checked + .notify-toggle-slider {
+            background-color: var(--accent-primary);
+        }
+
+        .notify-toggle input:checked + .notify-toggle-slider:before {
+            transform: translateX(20px);
+            background-color: white;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -5049,8 +5126,11 @@
         <div class="list-view" id="analyticsView">
             <div class="analytics-container">
                 <div class="analytics-header">
-                    <h1 class="analytics-title">📊 Subscriber Analytics</h1>
-                    <button class="btn btn-primary" id="updateStatsBtn">+ Update Stats</button>
+                    <h1 class="analytics-title">📊 Fan Analytics</h1>
+                    <div class="analytics-header-actions">
+                        <button class="btn btn-secondary" id="analyticsNotifyBtn" title="Notification Settings">🔔</button>
+                        <button class="btn btn-primary" id="updateStatsBtn">+ Update Stats</button>
+                    </div>
                 </div>
 
                 <!-- Current Stats Cards -->
@@ -5058,8 +5138,8 @@
                     <div class="analytics-stat-card main">
                         <div class="analytics-stat-icon">👥</div>
                         <div class="analytics-stat-content">
-                            <div class="analytics-stat-label">Total Subscribers</div>
-                            <div class="analytics-stat-value" id="currentSubscribers">2,000</div>
+                            <div class="analytics-stat-label">Total Fans</div>
+                            <div class="analytics-stat-value" id="currentSubscribers">1,971</div>
                             <div class="analytics-stat-sub">Email + SMS</div>
                         </div>
                     </div>
@@ -5068,7 +5148,7 @@
                         <div class="analytics-stat-content">
                             <div class="analytics-stat-label">This Week</div>
                             <div class="analytics-stat-value" id="weeklyGrowth">+0</div>
-                            <div class="analytics-stat-sub">new subscribers</div>
+                            <div class="analytics-stat-sub">new fans</div>
                         </div>
                     </div>
                     <div class="analytics-stat-card">
@@ -5076,7 +5156,7 @@
                         <div class="analytics-stat-content">
                             <div class="analytics-stat-label">This Month</div>
                             <div class="analytics-stat-value" id="monthlyGrowth">+0</div>
-                            <div class="analytics-stat-sub">new subscribers</div>
+                            <div class="analytics-stat-sub">new fans</div>
                         </div>
                     </div>
                 </div>
@@ -5117,12 +5197,12 @@
         <div class="modal-overlay" id="updateStatsModal">
             <div class="modal">
                 <div class="modal-header">
-                    <h3 class="modal-title">📊 Update Subscriber Count</h3>
+                    <h3 class="modal-title">📊 Update Fan Count</h3>
                     <button class="auto-panel-close" id="closeUpdateStats">✕</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Current Total Subscribers</label>
+                        <label class="form-label">Current Total Fans</label>
                         <input type="number" class="form-input" id="newSubscriberCount" placeholder="e.g., 2150">
                     </div>
                     <div class="form-group">
@@ -5133,6 +5213,78 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelUpdateStats">Cancel</button>
                     <button class="btn btn-primary" id="saveUpdateStats">Save Update</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Notification Settings Modal -->
+        <div class="modal-overlay" id="analyticsNotifyModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">🔔 Fan Analytics Notifications</h3>
+                    <button class="auto-panel-close" id="closeAnalyticsNotify">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Get email notifications for fan growth milestones.</p>
+                    
+                    <div class="notify-option">
+                        <label class="notify-toggle">
+                            <input type="checkbox" id="notifyDailyGrowth" checked>
+                            <span class="notify-toggle-slider"></span>
+                        </label>
+                        <div class="notify-option-content">
+                            <div class="notify-option-title">🔥 Hot Day Alert</div>
+                            <div class="notify-option-desc">Notify when you gain 50+ fans in a single update</div>
+                        </div>
+                    </div>
+
+                    <div class="notify-option">
+                        <label class="notify-toggle">
+                            <input type="checkbox" id="notifyGoalReached" checked>
+                            <span class="notify-toggle-slider"></span>
+                        </label>
+                        <div class="notify-option-content">
+                            <div class="notify-option-title">🎯 Goal Reached</div>
+                            <div class="notify-option-desc">Notify when you hit a growth goal milestone</div>
+                        </div>
+                    </div>
+
+                    <div class="notify-option">
+                        <label class="notify-toggle">
+                            <input type="checkbox" id="notifyWeeklyRecap" checked>
+                            <span class="notify-toggle-slider"></span>
+                        </label>
+                        <div class="notify-option-content">
+                            <div class="notify-option-title">📊 Weekly Recap</div>
+                            <div class="notify-option-desc">Sunday summary of your fan growth</div>
+                        </div>
+                    </div>
+
+                    <div class="notify-option">
+                        <label class="notify-toggle">
+                            <input type="checkbox" id="notifyMilestone">
+                            <span class="notify-toggle-slider"></span>
+                        </label>
+                        <div class="notify-option-content">
+                            <div class="notify-option-title">🏆 Round Number Milestones</div>
+                            <div class="notify-option-desc">Notify at 2.5K, 3K, 5K, 10K, etc.</div>
+                        </div>
+                    </div>
+
+                    <div class="notify-option">
+                        <label class="notify-toggle">
+                            <input type="checkbox" id="notifyStreak">
+                            <span class="notify-toggle-slider"></span>
+                        </label>
+                        <div class="notify-option-content">
+                            <div class="notify-option-title">⚡ Growth Streak</div>
+                            <div class="notify-option-desc">Notify when you have 7+ days of consecutive growth</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelAnalyticsNotify">Cancel</button>
+                    <button class="btn btn-primary" id="saveAnalyticsNotify">Save Settings</button>
                 </div>
             </div>
         </div>
@@ -9154,6 +9306,17 @@
             startCount: 1971
         };
 
+        let analyticsNotifySettings = {
+            dailyGrowth: true,      // 50+ fans in one update
+            goalReached: true,      // Hit a goal milestone
+            weeklyRecap: true,      // Weekly summary
+            milestone: false,       // Round numbers (2.5K, 3K, etc.)
+            streak: false           // 7+ days growth streak
+        };
+
+        // Round number milestones to check
+        const ROUND_MILESTONES = [2500, 3000, 4000, 5000, 7500, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000];
+
         const updateStatsBtn = document.getElementById('updateStatsBtn');
         const updateStatsModal = document.getElementById('updateStatsModal');
         const closeUpdateStats = document.getElementById('closeUpdateStats');
@@ -9161,6 +9324,13 @@
         const saveUpdateStats = document.getElementById('saveUpdateStats');
         const newSubscriberCount = document.getElementById('newSubscriberCount');
         const updateNotes = document.getElementById('updateNotes');
+        
+        // Notification settings modal elements
+        const analyticsNotifyBtn = document.getElementById('analyticsNotifyBtn');
+        const analyticsNotifyModal = document.getElementById('analyticsNotifyModal');
+        const closeAnalyticsNotify = document.getElementById('closeAnalyticsNotify');
+        const cancelAnalyticsNotify = document.getElementById('cancelAnalyticsNotify');
+        const saveAnalyticsNotify = document.getElementById('saveAnalyticsNotify');
 
         function renderAnalytics() {
             renderAnalyticsStats();
@@ -9212,7 +9382,7 @@
                                 ${goal.label} Goal
                             </div>
                             <div class="analytics-goal-target">
-                                Target: <span>${goal.target.toLocaleString()}</span> subscribers
+                                Target: <span>${goal.target.toLocaleString()}</span> fans
                             </div>
                         </div>
                         <div class="analytics-goal-progress">
@@ -9234,7 +9404,7 @@
             if (analyticsData.history.length === 0) {
                 container.innerHTML = `
                     <div class="analytics-empty">
-                        <p>No updates yet. Click "Update Stats" to log your first subscriber count!</p>
+                        <p>No updates yet. Click "Update Stats" to log your first fan count!</p>
                     </div>
                 `;
                 return;
@@ -9414,11 +9584,13 @@
         saveUpdateStats?.addEventListener('click', () => {
             const newCount = parseInt(newSubscriberCount.value);
             if (isNaN(newCount) || newCount < 0) {
-                alert('Please enter a valid subscriber count');
+                alert('Please enter a valid fan count');
                 return;
             }
 
             const previousCount = analyticsData.currentCount;
+            const dailyGrowth = newCount - previousCount;
+            
             analyticsData.currentCount = newCount;
             analyticsData.history.push({
                 date: new Date().toISOString(),
@@ -9431,19 +9603,278 @@
             renderAnalytics();
             updateStatsModal.classList.remove('open');
 
-            // Check for goal achievements
-            checkGoalAchievements(previousCount, newCount);
+            // Check for goal achievements (if enabled)
+            if (analyticsNotifySettings.goalReached) {
+                checkGoalAchievements(previousCount, newCount);
+            }
+            
+            // Check for daily growth milestone (50+ in an update)
+            if (analyticsNotifySettings.dailyGrowth && dailyGrowth >= 50) {
+                sendDailyGrowthNotification(dailyGrowth, newCount);
+            }
+            
+            // Check for round number milestones
+            if (analyticsNotifySettings.milestone) {
+                checkRoundMilestones(previousCount, newCount);
+            }
         });
+        
+        // Notification settings modal handlers
+        analyticsNotifyBtn?.addEventListener('click', () => {
+            // Load current settings into checkboxes
+            document.getElementById('notifyDailyGrowth').checked = analyticsNotifySettings.dailyGrowth;
+            document.getElementById('notifyGoalReached').checked = analyticsNotifySettings.goalReached;
+            document.getElementById('notifyWeeklyRecap').checked = analyticsNotifySettings.weeklyRecap;
+            document.getElementById('notifyMilestone').checked = analyticsNotifySettings.milestone;
+            document.getElementById('notifyStreak').checked = analyticsNotifySettings.streak;
+            analyticsNotifyModal.classList.add('open');
+        });
+        
+        closeAnalyticsNotify?.addEventListener('click', () => analyticsNotifyModal.classList.remove('open'));
+        cancelAnalyticsNotify?.addEventListener('click', () => analyticsNotifyModal.classList.remove('open'));
+        
+        saveAnalyticsNotify?.addEventListener('click', () => {
+            analyticsNotifySettings.dailyGrowth = document.getElementById('notifyDailyGrowth').checked;
+            analyticsNotifySettings.goalReached = document.getElementById('notifyGoalReached').checked;
+            analyticsNotifySettings.weeklyRecap = document.getElementById('notifyWeeklyRecap').checked;
+            analyticsNotifySettings.milestone = document.getElementById('notifyMilestone').checked;
+            analyticsNotifySettings.streak = document.getElementById('notifyStreak').checked;
+            
+            saveAnalyticsNotifySettings();
+            analyticsNotifyModal.classList.remove('open');
+        });
+        
+        function saveAnalyticsNotifySettings() {
+            db.collection('planner').doc('analyticsNotifySettings').set({
+                ...analyticsNotifySettings,
+                lastUpdated: new Date().toISOString()
+            }).catch(error => {
+                console.error("Error saving analytics notify settings:", error);
+            });
+        }
+        
+        function loadAnalyticsNotifySettings() {
+            return db.collection('planner').doc('analyticsNotifySettings').get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        analyticsNotifySettings.dailyGrowth = data.dailyGrowth ?? true;
+                        analyticsNotifySettings.goalReached = data.goalReached ?? true;
+                        analyticsNotifySettings.weeklyRecap = data.weeklyRecap ?? true;
+                        analyticsNotifySettings.milestone = data.milestone ?? false;
+                        analyticsNotifySettings.streak = data.streak ?? false;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading analytics notify settings:", error);
+                });
+        }
+        
+        function checkRoundMilestones(previousCount, newCount) {
+            ROUND_MILESTONES.forEach(milestone => {
+                if (previousCount < milestone && newCount >= milestone) {
+                    sendMilestoneNotification(milestone, newCount);
+                }
+            });
+        }
+        
+        async function sendMilestoneNotification(milestone, totalCount) {
+            const milestoneLabel = milestone >= 1000 ? `${(milestone/1000).toFixed(milestone % 1000 === 0 ? 0 : 1)}K` : milestone;
+            
+            const emailHtml = `
+                <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px; border-radius: 16px 16px 0 0; text-align: center;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #f97316, #ea580c); padding: 12px 20px; border-radius: 12px; margin-bottom: 16px;">
+                            <span style="color: white; font-weight: 700; font-size: 18px;">SJ</span>
+                        </div>
+                        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🏆 Milestone Reached!</h1>
+                        <p style="color: #9ca3af; margin: 8px 0 0 0; font-size: 14px;">SLOE JACK Fan Analytics</p>
+                    </div>
+                    
+                    <!-- Milestone Card -->
+                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 32px; text-align: center;">
+                        <div style="font-size: 64px; font-weight: 800; color: white; margin-bottom: 8px;">${milestoneLabel}</div>
+                        <div style="font-size: 18px; color: rgba(255,255,255,0.9);">Fans Milestone!</div>
+                    </div>
+                    
+                    <!-- Details -->
+                    <div style="background: #ffffff; padding: 24px; text-align: center;">
+                        <p style="color: #1f2937; margin: 0; font-size: 16px;">
+                            You've reached <strong style="color: #8b5cf6;">${milestone.toLocaleString()} fans</strong>!
+                        </p>
+                        <p style="color: #6b7280; margin: 12px 0 0 0; font-size: 14px;">
+                            Current total: ${totalCount.toLocaleString()} fans
+                        </p>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="background: #1f2937; padding: 24px; border-radius: 0 0 16px 16px; text-align: center;">
+                        <p style="color: #9ca3af; margin: 0; font-size: 13px;">
+                            📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            const templateParams = {
+                to_email: 'hillardc@gmail.com',
+                subject: `🏆 ${milestoneLabel} Fans Milestone Reached!`,
+                message_html: emailHtml
+            };
+            
+            try {
+                await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams,
+                    EMAILJS_CONFIG.publicKey
+                );
+                console.log('Milestone notification sent!');
+            } catch (error) {
+                console.error('Failed to send milestone notification:', error);
+            }
+        }
+
+        async function sendDailyGrowthNotification(dailyGrowth, totalCount) {
+            const emailHtml = `
+                <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px; border-radius: 16px 16px 0 0; text-align: center;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #f97316, #ea580c); padding: 12px 20px; border-radius: 12px; margin-bottom: 16px;">
+                            <span style="color: white; font-weight: 700; font-size: 18px;">SJ</span>
+                        </div>
+                        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🔥 Amazing Growth Day!</h1>
+                        <p style="color: #9ca3af; margin: 8px 0 0 0; font-size: 14px;">SLOE JACK Fan Analytics</p>
+                    </div>
+                    
+                    <!-- Stats Card -->
+                    <div style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); padding: 32px; text-align: center;">
+                        <div style="font-size: 64px; font-weight: 800; color: white; margin-bottom: 8px;">+${dailyGrowth}</div>
+                        <div style="font-size: 18px; color: rgba(255,255,255,0.9);">New Fans Today!</div>
+                    </div>
+                    
+                    <!-- Details -->
+                    <div style="background: #ffffff; padding: 24px;">
+                        <div style="display: flex; justify-content: space-between; padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 16px;">
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 24px; font-weight: 700; color: #1f2937;">${totalCount.toLocaleString()}</div>
+                                <div style="font-size: 12px; color: #6b7280; text-transform: uppercase;">Total Fans</div>
+                            </div>
+                            <div style="width: 1px; background: #e5e7eb;"></div>
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 24px; font-weight: 700; color: #22c55e;">+${dailyGrowth}</div>
+                                <div style="font-size: 12px; color: #6b7280; text-transform: uppercase;">Today's Growth</div>
+                            </div>
+                        </div>
+                        <p style="color: #6b7280; text-align: center; margin: 0; font-size: 14px;">
+                            You gained <strong>${dailyGrowth} new fans</strong> today! Keep up the amazing work! 🚀
+                        </p>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="background: #1f2937; padding: 24px; border-radius: 0 0 16px 16px; text-align: center;">
+                        <p style="color: #9ca3af; margin: 0; font-size: 13px;">
+                            📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                        </p>
+                        <p style="color: #6b7280; margin: 12px 0 0 0; font-size: 12px;">
+                            The fans are loving it! 🎸
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            const templateParams = {
+                to_email: 'hillardc@gmail.com',
+                subject: `🔥 +${dailyGrowth} New Fans Today! (${totalCount.toLocaleString()} total)`,
+                message_html: emailHtml
+            };
+            
+            try {
+                await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams,
+                    EMAILJS_CONFIG.publicKey
+                );
+                console.log('Daily growth notification sent!');
+            } catch (error) {
+                console.error('Failed to send daily growth notification:', error);
+            }
+        }
 
         function checkGoalAchievements(previousCount, newCount) {
             analyticsData.goals.forEach(goal => {
                 if (previousCount < goal.target && newCount >= goal.target) {
                     // Goal just achieved!
                     setTimeout(() => {
-                        alert(`🎉 Congratulations! You've reached your ${goal.label} goal of ${goal.target.toLocaleString()} subscribers!`);
+                        alert(`🎉 Congratulations! You've reached your ${goal.label} goal of ${goal.target.toLocaleString()} fans!`);
                     }, 500);
+                    
+                    // Send goal achievement email
+                    sendGoalAchievementNotification(goal, newCount);
                 }
             });
+        }
+        
+        async function sendGoalAchievementNotification(goal, totalCount) {
+            const emailHtml = `
+                <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px; border-radius: 16px 16px 0 0; text-align: center;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #f97316, #ea580c); padding: 12px 20px; border-radius: 12px; margin-bottom: 16px;">
+                            <span style="color: white; font-weight: 700; font-size: 18px;">SJ</span>
+                        </div>
+                        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🎉 Goal Achieved!</h1>
+                        <p style="color: #9ca3af; margin: 8px 0 0 0; font-size: 14px;">SLOE JACK Fan Analytics</p>
+                    </div>
+                    
+                    <!-- Goal Card -->
+                    <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 32px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 8px;">${goal.icon}</div>
+                        <div style="font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px;">${goal.label} Goal</div>
+                        <div style="font-size: 36px; font-weight: 800; color: white;">${goal.target.toLocaleString()} Fans</div>
+                    </div>
+                    
+                    <!-- Details -->
+                    <div style="background: #ffffff; padding: 24px; text-align: center;">
+                        <div style="font-size: 18px; color: #1f2937; margin-bottom: 16px;">
+                            You now have <strong style="color: #f97316;">${totalCount.toLocaleString()}</strong> total fans!
+                        </div>
+                        <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                            You crushed your ${goal.label.toLowerCase()} goal! Time to set your sights even higher! 🚀
+                        </p>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="background: #1f2937; padding: 24px; border-radius: 0 0 16px 16px; text-align: center;">
+                        <p style="color: #9ca3af; margin: 0; font-size: 13px;">
+                            📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                        </p>
+                        <p style="color: #6b7280; margin: 12px 0 0 0; font-size: 12px;">
+                            Keep building that fanbase! 🎸
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            const templateParams = {
+                to_email: 'hillardc@gmail.com',
+                subject: `🎉 Goal Achieved: ${goal.target.toLocaleString()} Fans! (${goal.label})`,
+                message_html: emailHtml
+            };
+            
+            try {
+                await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams,
+                    EMAILJS_CONFIG.publicKey
+                );
+                console.log('Goal achievement notification sent!');
+            } catch (error) {
+                console.error('Failed to send goal achievement notification:', error);
+            }
         }
 
         function saveAnalyticsData() {
@@ -9499,6 +9930,7 @@
             await loadPinnedPriorityOrder();
             await loadTodoData();
             await loadAnalyticsData();
+            await loadAnalyticsNotifySettings();
             
             // Update category styles and populate dropdowns
             updateCategoryStyles();
