@@ -1029,6 +1029,53 @@
             color: #eab308;
         }
 
+        /* Times per week selector */
+        .editor-times-select {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+
+        .editor-times-select:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .editor-times-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        /* Remaining count badge in pinned section */
+        .frequency-pinned-remaining {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            padding: 0.125rem 0.375rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            margin-left: 0.5rem;
+        }
+
+        .frequency-pinned-remaining.done {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .frequency-pinned-remaining.partial {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+
         .coming-up-unpin {
             width: 24px;
             height: 24px;
@@ -2110,6 +2157,14 @@
             background: #22c55e;
             border-color: #22c55e;
             color: white;
+        }
+
+        /* Partial completion state - shows count in checkbox */
+        .frequency-pinned-checkbox:not(:empty):not(.frequency-pinned-item.completed .frequency-pinned-checkbox) {
+            background: rgba(234, 179, 8, 0.2);
+            border-color: #eab308;
+            color: #eab308;
+            font-weight: 600;
         }
 
         .frequency-pinned-content {
@@ -6647,23 +6702,37 @@
                 return;
             }
             
-            container.innerHTML = taskList.map(task => `
-                <div class="editor-task-item" data-id="${task.id}">
-                    <div class="editor-task-drag">⋮⋮</div>
-                    <div class="editor-task-content">
-                        <span class="editor-task-title" contenteditable="true" 
-                              onblur="updateEditorTaskTitle(${task.id}, this.textContent)"
-                              onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${task.title}</span>
-                        <div class="editor-task-meta">
-                            <select class="editor-category-select" onchange="updateEditorTaskCategory(${task.id}, this.value)">
-                                ${getCategoryOptionsHtml(task.category)}
-                            </select>
+            container.innerHTML = taskList.map(task => {
+                // Times per week selector (only for weekly tasks)
+                const timesPerWeekHtml = frequency === 'weekly' ? `
+                    <select class="editor-times-select" onchange="updateEditorTaskTimesPerWeek(${task.id}, this.value)" title="Times per week">
+                        <option value="1" ${(task.timesPerWeek || 1) === 1 ? 'selected' : ''}>1x/week</option>
+                        <option value="2" ${task.timesPerWeek === 2 ? 'selected' : ''}>2x/week</option>
+                        <option value="3" ${task.timesPerWeek === 3 ? 'selected' : ''}>3x/week</option>
+                        <option value="4" ${task.timesPerWeek === 4 ? 'selected' : ''}>4x/week</option>
+                        <option value="5" ${task.timesPerWeek === 5 ? 'selected' : ''}>5x/week</option>
+                    </select>
+                ` : '';
+                
+                return `
+                    <div class="editor-task-item" data-id="${task.id}">
+                        <div class="editor-task-drag">⋮⋮</div>
+                        <div class="editor-task-content">
+                            <span class="editor-task-title" contenteditable="true" 
+                                  onblur="updateEditorTaskTitle(${task.id}, this.textContent)"
+                                  onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${task.title}</span>
+                            <div class="editor-task-meta">
+                                <select class="editor-category-select" onchange="updateEditorTaskCategory(${task.id}, this.value)">
+                                    ${getCategoryOptionsHtml(task.category)}
+                                </select>
+                                ${timesPerWeekHtml}
+                            </div>
                         </div>
+                        <button class="editor-pin-btn ${task.pinned ? 'pinned' : ''}" onclick="togglePinTaskInEditor(${task.id})" title="${task.pinned ? 'Unpin from Coming Up' : 'Pin to Coming Up'}">📌</button>
+                        <button class="editor-delete-btn" onclick="deleteEditorTask(${task.id})" title="Delete task">🗑️</button>
                     </div>
-                    <button class="editor-pin-btn ${task.pinned ? 'pinned' : ''}" onclick="togglePinTaskInEditor(${task.id})" title="${task.pinned ? 'Unpin from Coming Up' : 'Pin to Coming Up'}">📌</button>
-                    <button class="editor-delete-btn" onclick="deleteEditorTask(${task.id})" title="Delete task">🗑️</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function updateEditorTaskTitle(id, newTitle) {
@@ -6682,6 +6751,15 @@
                 task.category = newCategory;
                 saveTasks();
                 renderCurrentView();
+            }
+        }
+
+        function updateEditorTaskTimesPerWeek(id, times) {
+            const task = tasks['weekly'].find(t => t.id === id);
+            if (task) {
+                task.timesPerWeek = parseInt(times) || 1;
+                saveTasks();
+                renderFrequencyPinnedTasks();
             }
         }
 
@@ -6739,6 +6817,7 @@
         window.openTaskEditor = openTaskEditor;
         window.updateEditorTaskTitle = updateEditorTaskTitle;
         window.updateEditorTaskCategory = updateEditorTaskCategory;
+        window.updateEditorTaskTimesPerWeek = updateEditorTaskTimesPerWeek;
         window.deleteEditorTask = deleteEditorTask;
         window.togglePinTaskInEditor = togglePinTaskInEditor;
         window.addNewTaskInEditor = addNewTaskInEditor;
@@ -7994,11 +8073,14 @@
 
         function togglePinnedCompletion(frequency, taskId) {
             const key = `${frequency}-${taskId}`;
-            const index = pinnedCompletions[frequency].indexOf(key);
             const task = tasks[frequency].find(t => t.id === taskId);
+            const timesNeeded = (frequency === 'weekly' && task?.timesPerWeek) ? task.timesPerWeek : 1;
             
-            if (index === -1) {
-                // Mark as completed
+            // Count how many times this task has been completed this period
+            const completionCount = pinnedCompletions[frequency].filter(k => k === key).length;
+            
+            if (completionCount < timesNeeded) {
+                // Add another completion
                 pinnedCompletions[frequency].push(key);
                 
                 // Record in completion history for score
@@ -8014,10 +8096,13 @@
                     saveCompletionHistory();
                 }
             } else {
-                // Unmark
-                pinnedCompletions[frequency].splice(index, 1);
+                // Remove one completion (unchecking)
+                const indexToRemove = pinnedCompletions[frequency].lastIndexOf(key);
+                if (indexToRemove !== -1) {
+                    pinnedCompletions[frequency].splice(indexToRemove, 1);
+                }
                 
-                // Remove from completion history (today only)
+                // Remove from completion history (most recent for this task today)
                 const today = new Date().toDateString();
                 const completionIndex = completionHistory.findIndex(c => 
                     c.taskId === taskId && 
@@ -8084,7 +8169,18 @@
                 const grid = grids[freq];
                 const countEl = counts[freq];
                 
-                countEl.textContent = `${pinnedTasks.length}/15`;
+                // Calculate total completions needed and done for this frequency
+                let totalNeeded = 0;
+                let totalDone = 0;
+                pinnedTasks.forEach(task => {
+                    const key = `${freq}-${task.id}`;
+                    const timesNeeded = (freq === 'weekly' && task.timesPerWeek) ? task.timesPerWeek : 1;
+                    const completionCount = pinnedCompletions[freq].filter(k => k === key).length;
+                    totalNeeded += timesNeeded;
+                    totalDone += Math.min(completionCount, timesNeeded);
+                });
+                
+                countEl.textContent = `${totalDone}/${totalNeeded}`;
                 
                 if (pinnedTasks.length === 0) {
                     grid.innerHTML = `
@@ -8097,11 +8193,20 @@
                 
                 grid.innerHTML = pinnedTasks.map((task, index) => {
                     const key = `${freq}-${task.id}`;
-                    const isCompleted = pinnedCompletions[freq].includes(key);
+                    const timesNeeded = (freq === 'weekly' && task.timesPerWeek) ? task.timesPerWeek : 1;
+                    const completionCount = pinnedCompletions[freq].filter(k => k === key).length;
+                    const isFullyCompleted = completionCount >= timesNeeded;
                     const category = categories.find(c => c.id === task.category);
                     
+                    // Show remaining badge for multi-completion tasks
+                    const remainingBadgeHtml = timesNeeded > 1 ? `
+                        <span class="frequency-pinned-remaining ${isFullyCompleted ? 'done' : (completionCount > 0 ? 'partial' : '')}">
+                            ${completionCount}/${timesNeeded}
+                        </span>
+                    ` : '';
+                    
                     return `
-                        <div class="frequency-pinned-item ${isCompleted ? 'completed' : ''}"
+                        <div class="frequency-pinned-item ${isFullyCompleted ? 'completed' : ''}"
                              draggable="true"
                              data-freq="${freq}"
                              data-task-id="${task.id}"
@@ -8114,10 +8219,10 @@
                             <div class="frequency-pinned-drag">⋮⋮</div>
                             <div class="frequency-pinned-priority p${index + 1}">${index + 1}</div>
                             <div class="frequency-pinned-checkbox" onclick="event.stopPropagation(); togglePinnedCompletion('${freq}', ${task.id})">
-                                ${isCompleted ? '✓' : ''}
+                                ${isFullyCompleted ? '✓' : (completionCount > 0 ? completionCount : '')}
                             </div>
                             <div class="frequency-pinned-content" onclick="openTaskDetail('${freq}', ${task.id})">
-                                <div class="frequency-pinned-task">${task.title}</div>
+                                <div class="frequency-pinned-task">${task.title}${remainingBadgeHtml}</div>
                                 <div class="frequency-pinned-category">${category ? category.name : task.category}</div>
                             </div>
                             <button class="frequency-pinned-remove" onclick="event.stopPropagation(); unpinFrequencyTask('${freq}', ${task.id})" title="Unpin">✕</button>
