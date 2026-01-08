@@ -5227,6 +5227,13 @@
                 <div class="modal-body">
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Get email notifications for fan growth milestones.</p>
                     
+                    <!-- Email Address Field -->
+                    <div style="margin-bottom: 1.25rem;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.9rem;">📧 Notification Email</label>
+                        <input type="email" id="analyticsNotifyEmail" class="form-input" placeholder="your@email.com" style="width: 100%;">
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.35rem;">Where to send fan growth notifications</p>
+                    </div>
+                    
                     <div class="notify-option">
                         <label class="notify-toggle">
                             <input type="checkbox" id="notifyDailyGrowth" checked>
@@ -9311,7 +9318,8 @@
             goalReached: true,      // Hit a goal milestone
             weeklyRecap: true,      // Weekly summary
             milestone: false,       // Round numbers (2.5K, 3K, etc.)
-            streak: false           // 7+ days growth streak
+            streak: false,          // 7+ days growth streak
+            email: ''               // Email address for notifications
         };
 
         // Round number milestones to check
@@ -9627,6 +9635,7 @@
             document.getElementById('notifyWeeklyRecap').checked = analyticsNotifySettings.weeklyRecap;
             document.getElementById('notifyMilestone').checked = analyticsNotifySettings.milestone;
             document.getElementById('notifyStreak').checked = analyticsNotifySettings.streak;
+            document.getElementById('analyticsNotifyEmail').value = analyticsNotifySettings.email || '';
             analyticsNotifyModal.classList.add('open');
         });
         
@@ -9639,6 +9648,7 @@
             analyticsNotifySettings.weeklyRecap = document.getElementById('notifyWeeklyRecap').checked;
             analyticsNotifySettings.milestone = document.getElementById('notifyMilestone').checked;
             analyticsNotifySettings.streak = document.getElementById('notifyStreak').checked;
+            analyticsNotifySettings.email = document.getElementById('analyticsNotifyEmail').value.trim();
             
             saveAnalyticsNotifySettings();
             analyticsNotifyModal.classList.remove('open');
@@ -9663,6 +9673,7 @@
                         analyticsNotifySettings.weeklyRecap = data.weeklyRecap ?? true;
                         analyticsNotifySettings.milestone = data.milestone ?? false;
                         analyticsNotifySettings.streak = data.streak ?? false;
+                        analyticsNotifySettings.email = data.email || '';
                     }
                 })
                 .catch(error => {
@@ -9718,7 +9729,7 @@
             `;
             
             const templateParams = {
-                to_email: 'hillardc@gmail.com',
+                to_email: analyticsNotifySettings.email || 'hillardc@gmail.com',
                 subject: `🏆 ${milestoneLabel} Fans Milestone Reached!`,
                 message_html: emailHtml
             };
@@ -9785,7 +9796,7 @@
             `;
             
             const templateParams = {
-                to_email: 'hillardc@gmail.com',
+                to_email: analyticsNotifySettings.email || 'hillardc@gmail.com',
                 subject: `🔥 +${dailyGrowth} New Fans Today! (${totalCount.toLocaleString()} total)`,
                 message_html: emailHtml
             };
@@ -9859,7 +9870,7 @@
             `;
             
             const templateParams = {
-                to_email: 'hillardc@gmail.com',
+                to_email: analyticsNotifySettings.email || 'hillardc@gmail.com',
                 subject: `🎉 Goal Achieved: ${goal.target.toLocaleString()} Fans! (${goal.label})`,
                 message_html: emailHtml
             };
