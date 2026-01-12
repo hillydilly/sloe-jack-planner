@@ -1799,6 +1799,125 @@
             background: var(--bg-tertiary);
         }
 
+        /* Priority To-Dos Section */
+        .priority-todos-section {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(249, 115, 22, 0.05) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .priority-todos-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .priority-todos-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .priority-todos-icon {
+            font-size: 1.1rem;
+        }
+
+        .priority-todos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .priority-todo-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .priority-todo-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .priority-todo-item.completed {
+            opacity: 0.5;
+        }
+
+        .priority-todo-item.completed .priority-todo-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .priority-todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            font-size: 0.7rem;
+        }
+
+        .priority-todo-checkbox:hover {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .priority-todo-item.completed .priority-todo-checkbox {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+        }
+
+        .priority-todo-checkbox.p1 { border-color: #ef4444; }
+        .priority-todo-checkbox.p2 { border-color: #f97316; }
+        .priority-todo-checkbox.p3 { border-color: #3b82f6; }
+
+        .priority-todo-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .priority-todo-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .priority-todo-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .priority-todo-badge {
+            font-size: 0.65rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .priority-todo-badge.p1 { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .priority-todo-badge.p2 { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .priority-todo-badge.p3 { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+
         /* Daily Habits Section */
         .daily-habits-section {
             background: linear-gradient(135deg, rgba(234, 179, 8, 0.08) 0%, rgba(249, 115, 22, 0.05) 100%);
@@ -3998,6 +4117,139 @@
             margin: 0;
         }
 
+        /* Shopify Section */
+        .shopify-section {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(150, 191, 72, 0.05) 100%);
+            border: 1px solid rgba(150, 191, 72, 0.2);
+        }
+
+        .shopify-stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .shopify-stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .shopify-stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .shopify-stat-content {
+            flex: 1;
+        }
+
+        .shopify-stat-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .shopify-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #96bf48;
+        }
+
+        .shopify-stat-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .shopify-recent-orders {
+            margin-top: 1rem;
+        }
+
+        .shopify-recent-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .shopify-orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .shopify-order-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .shopify-order-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+        }
+
+        .shopify-order-number {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .shopify-order-customer {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .shopify-order-date {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .shopify-order-amount {
+            font-weight: 600;
+            color: #96bf48;
+            font-size: 0.9rem;
+        }
+
+        .shopify-loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .shopify-error {
+            text-align: center;
+            padding: 1rem;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .shopify-stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         /* Goals */
         .analytics-goals {
             display: flex;
@@ -5033,6 +5285,19 @@
                     <button class="coming-up-toggle" id="comingUpToggle">Hide</button>
                 </div>
                 
+                <!-- Priority To-Dos Section (from To-Do list) -->
+                <div class="priority-todos-section" id="priorityTodosSection" style="display: none;">
+                    <div class="priority-todos-header">
+                        <div class="priority-todos-title">
+                            <span class="priority-todos-icon">🚩</span>
+                            <span>Priority To-Dos</span>
+                        </div>
+                    </div>
+                    <div class="priority-todos-list" id="priorityTodosList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
                 <!-- Daily Habits Subsection -->
                 <div class="daily-habits-section" id="dailyHabitsSection">
                     <div class="daily-habits-header">
@@ -5212,6 +5477,54 @@
                             <div class="analytics-stat-label">This Month</div>
                             <div class="analytics-stat-value" id="monthlyGrowth">+0</div>
                             <div class="analytics-stat-sub">new fans</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shopify Stats Section -->
+                <div class="analytics-section shopify-section">
+                    <div class="analytics-section-header">
+                        <h2 class="analytics-section-title">🛍️ Shopify Store</h2>
+                        <button class="btn btn-secondary btn-sm" id="refreshShopifyBtn" title="Refresh Shopify Data">↻ Refresh</button>
+                    </div>
+                    <div class="shopify-stats-row" id="shopifyStatsRow">
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">💰</div>
+                            <div class="shopify-stat-content">
+                                <div class="shopify-stat-label">Total Revenue</div>
+                                <div class="shopify-stat-value" id="shopifyRevenue">$0.00</div>
+                                <div class="shopify-stat-sub">all time</div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">📦</div>
+                            <div class="shopify-stat-content">
+                                <div class="shopify-stat-label">Total Orders</div>
+                                <div class="shopify-stat-value" id="shopifyOrders">0</div>
+                                <div class="shopify-stat-sub">all time</div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">🛒</div>
+                            <div class="shopify-stat-content">
+                                <div class="shopify-stat-label">Customers</div>
+                                <div class="shopify-stat-value" id="shopifyCustomers">0</div>
+                                <div class="shopify-stat-sub">unique buyers</div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">📊</div>
+                            <div class="shopify-stat-content">
+                                <div class="shopify-stat-label">Avg Order</div>
+                                <div class="shopify-stat-value" id="shopifyAvgOrder">$0.00</div>
+                                <div class="shopify-stat-sub">per order</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shopify-recent-orders">
+                        <h3 class="shopify-recent-title">Recent Orders</h3>
+                        <div class="shopify-orders-list" id="shopifyRecentOrders">
+                            <div class="shopify-loading">Loading Shopify data...</div>
                         </div>
                     </div>
                 </div>
@@ -7860,6 +8173,11 @@
                 lastHabitResetDate = today;
                 saveDailyHabitsState();
                 renderDailyHabits();
+                
+                // Also check if it's a new week (Sunday) to reset weekly data
+                checkAndResetPinnedCompletions();
+                updateWeeklyProgress();
+                updateRecentlyCompleted();
             }
         }
 
@@ -8492,6 +8810,74 @@
         const todoDetailNotify = document.getElementById('todoDetailNotify');
         const headerTodoBadge = document.getElementById('headerTodoBadge');
         
+        // Render Priority To-Dos on homepage (items with priority 1, 2, or 3)
+        function renderPriorityTodos() {
+            const section = document.getElementById('priorityTodosSection');
+            const list = document.getElementById('priorityTodosList');
+            
+            if (!section || !list) return;
+            
+            // Get incomplete items with priority 1, 2, or 3
+            const priorityItems = todoData.items
+                .filter(item => !item.completed && item.priority && item.priority <= 3)
+                .sort((a, b) => (a.priority || 4) - (b.priority || 4));
+            
+            // Hide section if no priority items
+            if (priorityItems.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            const priorityLabels = { 1: 'P1', 2: 'P2', 3: 'P3' };
+            
+            list.innerHTML = priorityItems.map(item => {
+                const sectionName = todoData.sections.find(s => s.id === item.sectionId)?.name || '';
+                return `
+                    <div class="priority-todo-item ${item.completed ? 'completed' : ''}" 
+                         data-id="${item.id}"
+                         onclick="openPriorityTodoDetail(${item.id})">
+                        <div class="priority-todo-checkbox p${item.priority}" 
+                             onclick="event.stopPropagation(); togglePriorityTodo(${item.id})">
+                            ${item.completed ? '✓' : ''}
+                        </div>
+                        <div class="priority-todo-content">
+                            <div class="priority-todo-title">${item.title}</div>
+                            <div class="priority-todo-meta">
+                                <span class="priority-todo-badge p${item.priority}">${priorityLabels[item.priority]}</span>
+                                <span>${sectionName}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function togglePriorityTodo(itemId) {
+            const item = todoData.items.find(i => i.id === itemId);
+            if (item) {
+                item.completed = !item.completed;
+                saveTodoData();
+                renderPriorityTodos();
+                renderTodoList();
+            }
+        }
+        
+        function openPriorityTodoDetail(itemId) {
+            // Switch to To-Do view and open the item detail
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.view-tab[data-view="todo"]').classList.add('active');
+            document.querySelectorAll('.list-view').forEach(v => v.classList.remove('active'));
+            document.getElementById('todoView').classList.add('active');
+            
+            // Open the detail panel for this item
+            openTodoDetail(itemId);
+        }
+        
+        window.togglePriorityTodo = togglePriorityTodo;
+        window.openPriorityTodoDetail = openPriorityTodoDetail;
+        
         function renderTodoList() {
             if (!todoData.sections || todoData.sections.length === 0) {
                 todoData.sections = [{ id: 1, name: 'TO-DO', collapsed: false }];
@@ -8573,6 +8959,9 @@
                 const input = document.getElementById(`addInput-${addingTaskInSection}`);
                 if (input) input.focus();
             }
+            
+            // Update priority todos on homepage
+            renderPriorityTodos();
         }
         
         function renderTodoItem(item) {
@@ -9418,6 +9807,22 @@
             startCount: 1971
         };
 
+        // ========== SHOPIFY INTEGRATION ==========
+        const SHOPIFY_CONFIG = {
+            store: 'sloejack.myshopify.com',
+            accessToken: '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',
+            apiVersion: '2024-10'
+        };
+
+        let shopifyData = {
+            totalRevenue: 0,
+            totalOrders: 0,
+            totalCustomers: 0,
+            avgOrderValue: 0,
+            recentOrders: [],
+            lastFetched: null
+        };
+
         let analyticsNotifySettings = {
             dailyGrowth: true,      // 50+ fans in one update
             goalReached: true,      // Hit a goal milestone
@@ -9459,20 +9864,40 @@
 
             if (currentEl) currentEl.textContent = analyticsData.currentCount.toLocaleString();
 
-            // Calculate weekly growth
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            const weeklyHistory = analyticsData.history.filter(h => new Date(h.date) >= oneWeekAgo);
-            const weeklyGrowth = weeklyHistory.length > 0 ? 
-                analyticsData.currentCount - (weeklyHistory[0]?.previousCount || analyticsData.startCount) : 0;
+            // Calculate weekly growth (resets Sunday at midnight)
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay()); // Go back to Sunday
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            // Get the fan count at the start of this week
+            // Find the most recent history entry BEFORE this week started
+            const historyBeforeWeek = analyticsData.history
+                .filter(h => new Date(h.date) < startOfWeek)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // The count at start of week is either the last entry before the week, or the starting count
+            const countAtWeekStart = historyBeforeWeek.length > 0 
+                ? historyBeforeWeek[0].count 
+                : analyticsData.startCount;
+            
+            const weeklyGrowth = analyticsData.currentCount - countAtWeekStart;
             if (weeklyEl) weeklyEl.textContent = (weeklyGrowth >= 0 ? '+' : '') + weeklyGrowth.toLocaleString();
 
-            // Calculate monthly growth
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-            const monthlyHistory = analyticsData.history.filter(h => new Date(h.date) >= oneMonthAgo);
-            const monthlyGrowth = monthlyHistory.length > 0 ? 
-                analyticsData.currentCount - (monthlyHistory[0]?.previousCount || analyticsData.startCount) : 0;
+            // Calculate monthly growth (resets 1st of month at midnight)
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+            
+            // Get the fan count at the start of this month
+            const historyBeforeMonth = analyticsData.history
+                .filter(h => new Date(h.date) < startOfMonth)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const countAtMonthStart = historyBeforeMonth.length > 0 
+                ? historyBeforeMonth[0].count 
+                : analyticsData.startCount;
+            
+            const monthlyGrowth = analyticsData.currentCount - countAtMonthStart;
             if (monthlyEl) monthlyEl.textContent = (monthlyGrowth >= 0 ? '+' : '') + monthlyGrowth.toLocaleString();
         }
 
@@ -9481,11 +9906,47 @@
             if (!container) return;
 
             const current = analyticsData.currentCount;
+            const now = new Date();
+            
+            // Get count at start of this week (Sunday midnight)
+            function getWeekStartCount() {
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                
+                // Find the last history entry before this week started
+                const historyBeforeWeek = analyticsData.history
+                    .filter(h => new Date(h.date) < weekStart)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                if (historyBeforeWeek.length > 0) {
+                    return historyBeforeWeek[0].count;
+                }
+                
+                // If no history before week, use current count (0% progress)
+                return current;
+            }
 
             container.innerHTML = analyticsData.goals.map(goal => {
-                const progress = Math.min((current / goal.target) * 100, 100);
-                const achieved = current >= goal.target;
-                const remaining = goal.target - current;
+                let progress, achieved, remaining, targetDisplay;
+                
+                if (goal.deadline === '1 week') {
+                    // Weekly goal: +100 fans from week start
+                    const weekStartCount = getWeekStartCount();
+                    const weeklyTarget = weekStartCount + 100;
+                    const gainedThisWeek = current - weekStartCount;
+                    
+                    progress = Math.max(0, Math.min((gainedThisWeek / 100) * 100, 100));
+                    achieved = gainedThisWeek >= 100;
+                    remaining = 100 - gainedThisWeek;
+                    targetDisplay = weeklyTarget;
+                } else {
+                    // Other goals: fixed targets
+                    progress = Math.min((current / goal.target) * 100, 100);
+                    achieved = current >= goal.target;
+                    remaining = goal.target - current;
+                    targetDisplay = goal.target;
+                }
 
                 return `
                     <div class="analytics-goal ${achieved ? 'achieved' : ''}">
@@ -9495,14 +9956,14 @@
                                 ${goal.label} Goal
                             </div>
                             <div class="analytics-goal-target">
-                                Target: <span>${goal.target.toLocaleString()}</span> fans
+                                Target: <span>${targetDisplay.toLocaleString()}</span> fans
                             </div>
                         </div>
                         <div class="analytics-goal-progress">
                             <div class="analytics-goal-progress-bar" style="width: ${progress}%"></div>
                         </div>
                         <div class="analytics-goal-stats">
-                            <span>${achieved ? '🎉 Goal achieved!' : `${remaining.toLocaleString()} to go`}</span>
+                            <span>${achieved ? '🎉 Goal achieved!' : `${Math.abs(remaining).toLocaleString()} to go`}</span>
                             <span class="analytics-goal-percent">${progress.toFixed(1)}%</span>
                         </div>
                     </div>
@@ -9731,6 +10192,136 @@
                 checkRoundMilestones(previousCount, newCount);
             }
         });
+
+        // ========== SHOPIFY FUNCTIONS ==========
+        const refreshShopifyBtn = document.getElementById('refreshShopifyBtn');
+        
+        async function fetchShopifyData() {
+            const ordersContainer = document.getElementById('shopifyRecentOrders');
+            ordersContainer.innerHTML = '<div class="shopify-loading">Loading Shopify data...</div>';
+            
+            try {
+                // Use a CORS proxy since we're making client-side requests
+                // Note: For production, you'd want to use your own proxy or Firebase Function
+                const proxyUrl = 'https://corsproxy.io/?';
+                const shopifyUrl = `https://${SHOPIFY_CONFIG.store}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=50`;
+                
+                const ordersResponse = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
+                    headers: {
+                        'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!ordersResponse.ok) {
+                    throw new Error(`Shopify API error: ${ordersResponse.status}`);
+                }
+                
+                const ordersData = await ordersResponse.json();
+                const orders = ordersData.orders || [];
+                
+                // Calculate totals
+                let totalRevenue = 0;
+                let customerEmails = new Set();
+                
+                orders.forEach(order => {
+                    totalRevenue += parseFloat(order.total_price) || 0;
+                    if (order.email) customerEmails.add(order.email.toLowerCase());
+                });
+                
+                shopifyData.totalRevenue = totalRevenue;
+                shopifyData.totalOrders = orders.length;
+                shopifyData.totalCustomers = customerEmails.size;
+                shopifyData.avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+                shopifyData.recentOrders = orders.slice(0, 5);
+                shopifyData.lastFetched = new Date().toISOString();
+                
+                // Save to Firebase
+                saveShopifyData();
+                
+                // Update UI
+                renderShopifyStats();
+                
+            } catch (error) {
+                console.error('Shopify fetch error:', error);
+                ordersContainer.innerHTML = `
+                    <div class="shopify-error">
+                        <p>Unable to connect to Shopify API</p>
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Error: ${error.message}</p>
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Using cached data if available...</p>
+                    </div>
+                `;
+                
+                // Try to load from Firebase
+                await loadShopifyData();
+                if (shopifyData.lastFetched) {
+                    renderShopifyStats();
+                }
+            }
+        }
+        
+        function renderShopifyStats() {
+            // Update stat cards
+            document.getElementById('shopifyRevenue').textContent = '$' + shopifyData.totalRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById('shopifyOrders').textContent = shopifyData.totalOrders.toLocaleString();
+            document.getElementById('shopifyCustomers').textContent = shopifyData.totalCustomers.toLocaleString();
+            document.getElementById('shopifyAvgOrder').textContent = '$' + shopifyData.avgOrderValue.toFixed(2);
+            
+            // Render recent orders
+            const ordersContainer = document.getElementById('shopifyRecentOrders');
+            
+            if (shopifyData.recentOrders.length === 0) {
+                ordersContainer.innerHTML = '<div class="shopify-loading">No orders yet</div>';
+                return;
+            }
+            
+            ordersContainer.innerHTML = shopifyData.recentOrders.map(order => {
+                const date = new Date(order.created_at);
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const customerName = order.customer?.first_name || order.email?.split('@')[0] || 'Guest';
+                
+                return `
+                    <div class="shopify-order-item">
+                        <div class="shopify-order-info">
+                            <span class="shopify-order-number">#${order.order_number}</span>
+                            <span class="shopify-order-customer">${customerName}</span>
+                            <span class="shopify-order-date">${dateStr}</span>
+                        </div>
+                        <span class="shopify-order-amount">$${parseFloat(order.total_price).toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function saveShopifyData() {
+            db.collection('planner').doc('shopifyData').set({
+                ...shopifyData,
+                lastUpdated: new Date().toISOString()
+            }).catch(error => {
+                console.error("Error saving Shopify data:", error);
+            });
+        }
+        
+        function loadShopifyData() {
+            return db.collection('planner').doc('shopifyData').get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        shopifyData.totalRevenue = data.totalRevenue || 0;
+                        shopifyData.totalOrders = data.totalOrders || 0;
+                        shopifyData.totalCustomers = data.totalCustomers || 0;
+                        shopifyData.avgOrderValue = data.avgOrderValue || 0;
+                        shopifyData.recentOrders = data.recentOrders || [];
+                        shopifyData.lastFetched = data.lastFetched || null;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading Shopify data:", error);
+                });
+        }
+        
+        // Shopify refresh button handler
+        refreshShopifyBtn?.addEventListener('click', fetchShopifyData);
         
         // Notification settings modal handlers
         analyticsNotifyBtn?.addEventListener('click', () => {
@@ -10047,6 +10638,7 @@
             await loadTodoData();
             await loadAnalyticsData();
             await loadAnalyticsNotifySettings();
+            await loadShopifyData();
             
             // Update category styles and populate dropdowns
             updateCategoryStyles();
@@ -10063,6 +10655,12 @@
             updateStats();
             updateRecentlyCompleted();
             updateWeeklyProgress();
+            
+            // Load Shopify data (render cached first, then fetch fresh)
+            if (shopifyData.lastFetched) {
+                renderShopifyStats();
+            }
+            fetchShopifyData(); // Fetch fresh data in background
             
             // Check if we need to send scheduled email
             checkAndSendScheduledEmail();
