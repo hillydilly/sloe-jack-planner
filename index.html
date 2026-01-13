@@ -4576,6 +4576,16 @@
             border-radius: 8px;
         }
 
+        .analytics-history-item.subs-entry {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(139, 92, 246, 0.08) 100%);
+        }
+
+        .analytics-history-type {
+            font-size: 1rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
         .analytics-history-date {
             font-size: 0.8rem;
             color: var(--text-muted);
@@ -4586,6 +4596,10 @@
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-primary);
+        }
+
+        .analytics-history-item.subs-entry .analytics-history-value {
+            color: #8b5cf6;
         }
 
         .analytics-history-change {
@@ -4602,6 +4616,14 @@
         .analytics-history-change.negative {
             background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
+        }
+
+        .analytics-history-revenue {
+            font-size: 0.75rem;
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
         }
 
         .analytics-history-note {
@@ -10755,7 +10777,8 @@
                 if (historyBeforeWeek.length > 0) {
                     return historyBeforeWeek[0].total;
                 }
-                return currentSubs; // No history, start from current
+                // No history before week - use startCount as baseline
+                return paidSubscriberData.startCount;
             }
 
             container.innerHTML = paidSubscriberGoals.map(goal => {
@@ -10808,29 +10831,59 @@
             const container = document.getElementById('analyticsHistory');
             if (!container) return;
 
-            if (analyticsData.history.length === 0) {
+            const hasEmailHistory = analyticsData.history.length > 0;
+            const hasPaidHistory = paidSubscriberData.history.length > 0;
+
+            if (!hasEmailHistory && !hasPaidHistory) {
                 container.innerHTML = `
                     <div class="analytics-empty">
-                        <p>No updates yet. Click "Update Stats" to log your first fan count!</p>
+                        <p>No updates yet. Click "Update Fans" or "Update Subs" to log your first update!</p>
                     </div>
                 `;
                 return;
             }
 
-            // Sort by date descending (most recent first)
-            const sortedHistory = [...analyticsData.history].sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Combine both histories with type indicator
+            let combinedHistory = [];
+            
+            // Add email+SMS history
+            analyticsData.history.forEach(entry => {
+                combinedHistory.push({
+                    ...entry,
+                    type: 'fans',
+                    change: entry.count - (entry.previousCount || analyticsData.startCount)
+                });
+            });
+            
+            // Add paid subscriber history
+            paidSubscriberData.history.forEach(entry => {
+                combinedHistory.push({
+                    date: entry.date,
+                    count: entry.total,
+                    type: 'subs',
+                    change: entry.total - (entry.previousTotal || paidSubscriberData.startCount),
+                    revenue: entry.revenue
+                });
+            });
 
-            container.innerHTML = sortedHistory.map(entry => {
-                const change = entry.count - (entry.previousCount || analyticsData.startCount);
-                const changeClass = change >= 0 ? 'positive' : 'negative';
-                const changeText = change >= 0 ? `+${change}` : change;
+            // Sort by date descending (most recent first)
+            combinedHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            container.innerHTML = combinedHistory.map(entry => {
+                const changeClass = entry.change >= 0 ? 'positive' : 'negative';
+                const changeText = entry.change >= 0 ? `+${entry.change}` : entry.change;
+                const isSubs = entry.type === 'subs';
+                const typeIcon = isSubs ? '💎' : '👥';
+                const typeClass = isSubs ? 'subs-entry' : 'fans-entry';
 
                 return `
-                    <div class="analytics-history-item">
+                    <div class="analytics-history-item ${typeClass}">
+                        <div class="analytics-history-type">${typeIcon}</div>
                         <div class="analytics-history-date">${formatHistoryDate(entry.date)}</div>
                         <div class="analytics-history-value">${entry.count.toLocaleString()}</div>
                         <div class="analytics-history-change ${changeClass}">${changeText}</div>
-                        <div class="analytics-history-note">${entry.note || ''}</div>
+                        ${isSubs && entry.revenue ? `<div class="analytics-history-revenue">$${entry.revenue.toFixed(0)}/mo</div>` : ''}
+                        ${entry.note ? `<div class="analytics-history-note">${entry.note}</div>` : ''}
                     </div>
                 `;
             }).join('');
