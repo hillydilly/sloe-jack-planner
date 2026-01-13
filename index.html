@@ -210,6 +210,14 @@
             box-shadow: var(--shadow-glow);
         }
 
+        .btn-primary.paid-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .btn-primary.paid-btn:hover {
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+
         .btn-secondary {
             background: var(--bg-tertiary);
             color: var(--text-primary);
@@ -836,6 +844,32 @@
             display: flex;
             justify-content: flex-end;
             gap: 0.75rem;
+        }
+
+        /* Paid Stats Preview */
+        .paid-stats-preview {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .paid-preview-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .paid-preview-row:first-child {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .paid-preview-row span:last-child {
+            font-weight: 700;
+            color: #8b5cf6;
+            font-size: 1.1rem;
         }
 
         /* Category Manager */
@@ -4044,9 +4078,168 @@
 
         .analytics-stats-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
             gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .analytics-stats-row.three-col {
+            grid-template-columns: 2fr 1fr 1fr;
+        }
+
+        /* Analytics Overview - New Unified Design */
+        .analytics-overview {
+            display: flex;
+            gap: 2rem;
             margin-bottom: 2rem;
+            align-items: stretch;
+        }
+
+        .analytics-totals {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-width: 200px;
+        }
+
+        .analytics-total-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .analytics-total-card.fans {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(249, 115, 22, 0.1) 100%);
+            border-color: var(--accent-primary);
+        }
+
+        .analytics-total-card.subs {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border-color: #8b5cf6;
+        }
+
+        .analytics-total-icon {
+            font-size: 2rem;
+        }
+
+        .analytics-total-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .analytics-total-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .analytics-total-card.fans .analytics-total-value {
+            color: var(--accent-primary);
+        }
+
+        .analytics-total-card.subs .analytics-total-value {
+            color: #8b5cf6;
+        }
+
+        .analytics-stats-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 120px repeat(3, 1fr);
+            gap: 0.75rem;
+            align-content: center;
+        }
+
+        .analytics-stats-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            padding-right: 0.5rem;
+        }
+
+        .analytics-stats-label.purple {
+            color: #8b5cf6;
+        }
+
+        .analytics-mini-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            text-align: center;
+        }
+
+        .analytics-mini-stat.purple {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .analytics-mini-stat.blank {
+            background: transparent;
+            border: none;
+        }
+
+        .mini-stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.25rem;
+        }
+
+        .mini-stat-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .mini-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .mini-stat-sub {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .analytics-mini-stat.purple .mini-stat-value {
+            color: #8b5cf6;
+        }
+
+        @media (max-width: 900px) {
+            .analytics-overview {
+                flex-direction: column;
+            }
+            .analytics-totals {
+                flex-direction: row;
+            }
+            .analytics-stats-grid {
+                grid-template-columns: 100px repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .analytics-totals {
+                flex-direction: column;
+            }
+            .analytics-stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .analytics-stats-label {
+                grid-column: 1 / -1;
+                justify-content: center;
+                padding: 0.5rem 0;
+            }
         }
 
         .analytics-stat-card {
@@ -4093,6 +4286,28 @@
         .analytics-stat-sub {
             font-size: 0.75rem;
             color: var(--text-muted);
+        }
+
+        /* Split Goals Layout */
+        .analytics-goals-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .goals-column {
+            margin-bottom: 0;
+        }
+
+        .goals-column .analytics-goals {
+            max-height: none;
+        }
+
+        @media (max-width: 1024px) {
+            .analytics-goals-split {
+                grid-template-columns: 1fr;
+            }
         }
 
         .analytics-section {
@@ -5449,93 +5664,89 @@
                     <h1 class="analytics-title">📊 Fan Analytics</h1>
                     <div class="analytics-header-actions">
                         <button class="btn btn-secondary" id="analyticsNotifyBtn" title="Notification Settings">🔔</button>
-                        <button class="btn btn-primary" id="updateStatsBtn">+ Update Stats</button>
+                        <button class="btn btn-primary" id="updateStatsBtn">+ Update Fans</button>
+                        <button class="btn btn-primary paid-btn" id="updatePaidStatsBtn">+ Update Subs</button>
                     </div>
                 </div>
 
-                <!-- Current Stats Cards -->
-                <div class="analytics-stats-row">
-                    <div class="analytics-stat-card main">
-                        <div class="analytics-stat-icon">👥</div>
-                        <div class="analytics-stat-content">
-                            <div class="analytics-stat-label">Total Fans</div>
-                            <div class="analytics-stat-value" id="currentSubscribers">1,971</div>
-                            <div class="analytics-stat-sub">Email + SMS</div>
-                        </div>
-                    </div>
-                    <div class="analytics-stat-card">
-                        <div class="analytics-stat-icon">📈</div>
-                        <div class="analytics-stat-content">
-                            <div class="analytics-stat-label">This Week</div>
-                            <div class="analytics-stat-value" id="weeklyGrowth">+0</div>
-                            <div class="analytics-stat-sub">new fans</div>
-                        </div>
-                    </div>
-                    <div class="analytics-stat-card">
-                        <div class="analytics-stat-icon">📅</div>
-                        <div class="analytics-stat-content">
-                            <div class="analytics-stat-label">This Month</div>
-                            <div class="analytics-stat-value" id="monthlyGrowth">+0</div>
-                            <div class="analytics-stat-sub">new fans</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shopify Stats Section -->
-                <div class="analytics-section shopify-section">
-                    <div class="analytics-section-header">
-                        <h2 class="analytics-section-title">🛍️ Shopify Store</h2>
-                        <button class="btn btn-secondary btn-sm" id="refreshShopifyBtn" title="Refresh Shopify Data">↻ Refresh</button>
-                    </div>
-                    <div class="shopify-stats-row" id="shopifyStatsRow">
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-icon">💰</div>
-                            <div class="shopify-stat-content">
-                                <div class="shopify-stat-label">Total Revenue</div>
-                                <div class="shopify-stat-value" id="shopifyRevenue">$0.00</div>
-                                <div class="shopify-stat-sub">all time</div>
+                <!-- Analytics Stats - Unified Design -->
+                <div class="analytics-overview">
+                    <!-- Left Side - Totals -->
+                    <div class="analytics-totals">
+                        <div class="analytics-total-card fans">
+                            <div class="analytics-total-icon">👥</div>
+                            <div class="analytics-total-content">
+                                <div class="analytics-total-label">Email + SMS</div>
+                                <div class="analytics-total-value" id="currentSubscribers">2,161</div>
                             </div>
                         </div>
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-icon">📦</div>
-                            <div class="shopify-stat-content">
-                                <div class="shopify-stat-label">Total Orders</div>
-                                <div class="shopify-stat-value" id="shopifyOrders">0</div>
-                                <div class="shopify-stat-sub">all time</div>
-                            </div>
-                        </div>
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-icon">🛒</div>
-                            <div class="shopify-stat-content">
-                                <div class="shopify-stat-label">Customers</div>
-                                <div class="shopify-stat-value" id="shopifyCustomers">0</div>
-                                <div class="shopify-stat-sub">unique buyers</div>
-                            </div>
-                        </div>
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-icon">📊</div>
-                            <div class="shopify-stat-content">
-                                <div class="shopify-stat-label">Avg Order</div>
-                                <div class="shopify-stat-value" id="shopifyAvgOrder">$0.00</div>
-                                <div class="shopify-stat-sub">per order</div>
+                        <div class="analytics-total-card subs">
+                            <div class="analytics-total-icon">💎</div>
+                            <div class="analytics-total-content">
+                                <div class="analytics-total-label">Paid Subscribers</div>
+                                <div class="analytics-total-value" id="currentPaidSubscribers">0</div>
                             </div>
                         </div>
                     </div>
-                    <div class="shopify-recent-orders">
-                        <h3 class="shopify-recent-title">Recent Orders</h3>
-                        <div class="shopify-orders-list" id="shopifyRecentOrders">
-                            <div class="shopify-loading">Loading Shopify data...</div>
+                    
+                    <!-- Right Side - Stats Grid -->
+                    <div class="analytics-stats-grid">
+                        <!-- Email + SMS Row -->
+                        <div class="analytics-stats-label">📧 Email + SMS</div>
+                        <div class="analytics-mini-stat">
+                            <div class="mini-stat-icon">📈</div>
+                            <div class="mini-stat-label">This Week</div>
+                            <div class="mini-stat-value" id="weeklyGrowth">+0</div>
+                            <div class="mini-stat-sub">new fans</div>
+                        </div>
+                        <div class="analytics-mini-stat">
+                            <div class="mini-stat-icon">📅</div>
+                            <div class="mini-stat-label">This Month</div>
+                            <div class="mini-stat-value" id="monthlyGrowth">+0</div>
+                            <div class="mini-stat-sub">new fans</div>
+                        </div>
+                        <div class="analytics-mini-stat blank"></div>
+                        
+                        <!-- Paid Subscribers Row -->
+                        <div class="analytics-stats-label purple">💎 Paid Subs</div>
+                        <div class="analytics-mini-stat purple">
+                            <div class="mini-stat-icon">📈</div>
+                            <div class="mini-stat-label">This Week</div>
+                            <div class="mini-stat-value" id="paidWeeklyGrowth">+0</div>
+                            <div class="mini-stat-sub">new subs</div>
+                        </div>
+                        <div class="analytics-mini-stat purple">
+                            <div class="mini-stat-icon">📅</div>
+                            <div class="mini-stat-label">This Month</div>
+                            <div class="mini-stat-value" id="paidMonthlyGrowth">+0</div>
+                            <div class="mini-stat-sub">new subs</div>
+                        </div>
+                        <div class="analytics-mini-stat purple">
+                            <div class="mini-stat-icon">💰</div>
+                            <div class="mini-stat-label">Monthly Rev</div>
+                            <div class="mini-stat-value" id="monthlyRevenue">$0</div>
+                            <div class="mini-stat-sub">recurring</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Goals Section -->
-                <div class="analytics-section">
-                    <div class="analytics-section-header">
-                        <h2 class="analytics-section-title">🎯 Growth Goals</h2>
+                <!-- Goals Section - Split View -->
+                <div class="analytics-goals-split">
+                    <div class="analytics-section goals-column">
+                        <div class="analytics-section-header">
+                            <h2 class="analytics-section-title">👥 Email + SMS Goals</h2>
+                        </div>
+                        <div class="analytics-goals" id="analyticsGoals">
+                            <!-- Goals populated by JS -->
+                        </div>
                     </div>
-                    <div class="analytics-goals" id="analyticsGoals">
-                        <!-- Goals populated by JS -->
+                    <div class="analytics-section goals-column">
+                        <div class="analytics-section-header">
+                            <h2 class="analytics-section-title">💎 Paid Subscriber Goals</h2>
+                        </div>
+                        <div class="analytics-goals" id="paidSubscriberGoals">
+                            <!-- Paid goals populated by JS -->
+                        </div>
                     </div>
                 </div>
 
@@ -5581,6 +5792,45 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelUpdateStats">Cancel</button>
                     <button class="btn btn-primary" id="saveUpdateStats">Save Update</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Paid Subscribers Modal -->
+        <div class="modal-overlay" id="updatePaidStatsModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">💎 Update Paid Subscribers</h3>
+                    <button class="auto-panel-close" id="closePaidStats">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.85rem;">Enter the number of subscribers at each tier:</p>
+                    <div class="form-group">
+                        <label class="form-label">$0.99/month subscribers</label>
+                        <input type="number" class="form-input" id="tier1Count" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">$4.99/month subscribers</label>
+                        <input type="number" class="form-input" id="tier2Count" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">$9.99/month subscribers</label>
+                        <input type="number" class="form-input" id="tier3Count" placeholder="0" min="0">
+                    </div>
+                    <div class="paid-stats-preview">
+                        <div class="paid-preview-row">
+                            <span>Total Subscribers:</span>
+                            <span id="paidPreviewTotal">0</span>
+                        </div>
+                        <div class="paid-preview-row">
+                            <span>Monthly Revenue:</span>
+                            <span id="paidPreviewRevenue">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelPaidStats">Cancel</button>
+                    <button class="btn btn-primary" id="savePaidStats">Save Update</button>
                 </div>
             </div>
         </div>
@@ -9796,8 +10046,8 @@
             currentCount: 1971,
             history: [],
             goals: [
-                { id: 1, label: '1 Week', target: 2071, deadline: '1 week', icon: '🎯' },
-                { id: 2, label: '1 Month', target: 2971, deadline: '1 month', icon: '📅' },
+                { id: 1, label: '1 Week', target: 100, deadline: '1 week', icon: '🎯' },
+                { id: 2, label: '1 Month', target: 500, deadline: '1 month', icon: '📅' },
                 { id: 3, label: '6 Months', target: 6000, deadline: '6 months', icon: '🚀' },
                 { id: 4, label: '1 Year', target: 12000, deadline: '1 year', icon: '⭐' },
                 { id: 5, label: '2 Years', target: 26000, deadline: '2 years', icon: '💎' },
@@ -9807,21 +10057,41 @@
             startCount: 1971
         };
 
-        // ========== SHOPIFY INTEGRATION ==========
-        const SHOPIFY_CONFIG = {
-            store: 'sloejack.myshopify.com',
-            accessToken: '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',
-            apiVersion: '2024-10'
+        // ========== PAID SUBSCRIBERS ==========
+        let paidSubscriberData = {
+            tier1: 0,  // $0.99/month
+            tier2: 0,  // $4.99/month
+            tier3: 0,  // $9.99/month
+            history: [],
+            startDate: '2026-01-12',
+            startCount: 0
         };
 
-        let shopifyData = {
-            totalRevenue: 0,
-            totalOrders: 0,
-            totalCustomers: 0,
-            avgOrderValue: 0,
-            recentOrders: [],
-            lastFetched: null
+        const paidSubscriberGoals = [
+            { id: 1, label: '1 Week', targetSubs: 20, targetRevenue: 200, deadline: '1 week', icon: '🎯' },
+            { id: 2, label: '1 Month', targetSubs: 50, targetRevenue: 500, deadline: '1 month', icon: '📅' },
+            { id: 3, label: '6 Months', targetSubs: 600, targetRevenue: 6000, deadline: '6 months', icon: '🚀' },
+            { id: 4, label: '1 Year', targetSubs: 1350, targetRevenue: 13500, deadline: '1 year', icon: '⭐' },
+            { id: 5, label: '2 Years', targetSubs: 4000, targetRevenue: 40000, deadline: '2 years', icon: '💎' },
+            { id: 6, label: '3 Years', targetSubs: 9000, targetRevenue: 90000, deadline: '3 years', icon: '👑' }
+        ];
+
+        // Pricing tiers
+        const TIER_PRICES = {
+            tier1: 0.99,
+            tier2: 4.99,
+            tier3: 9.99
         };
+
+        function getTotalPaidSubscribers() {
+            return paidSubscriberData.tier1 + paidSubscriberData.tier2 + paidSubscriberData.tier3;
+        }
+
+        function getMonthlyRevenue() {
+            return (paidSubscriberData.tier1 * TIER_PRICES.tier1) +
+                   (paidSubscriberData.tier2 * TIER_PRICES.tier2) +
+                   (paidSubscriberData.tier3 * TIER_PRICES.tier3);
+        }
 
         let analyticsNotifySettings = {
             dailyGrowth: true,      // 50+ fans in one update
@@ -9853,6 +10123,7 @@
         function renderAnalytics() {
             renderAnalyticsStats();
             renderAnalyticsGoals();
+            renderPaidSubscriberGoals();
             renderAnalyticsHistory();
             renderGrowthChart();
         }
@@ -9899,6 +10170,54 @@
             
             const monthlyGrowth = analyticsData.currentCount - countAtMonthStart;
             if (monthlyEl) monthlyEl.textContent = (monthlyGrowth >= 0 ? '+' : '') + monthlyGrowth.toLocaleString();
+
+            // Render paid subscriber stats
+            renderPaidSubscriberStats();
+        }
+
+        function renderPaidSubscriberStats() {
+            const totalEl = document.getElementById('currentPaidSubscribers');
+            const revenueEl = document.getElementById('monthlyRevenue');
+            const weeklyEl = document.getElementById('paidWeeklyGrowth');
+            const monthlyEl = document.getElementById('paidMonthlyGrowth');
+            
+            const totalSubs = getTotalPaidSubscribers();
+            const revenue = getMonthlyRevenue();
+            
+            if (totalEl) totalEl.textContent = totalSubs.toLocaleString();
+            if (revenueEl) revenueEl.textContent = '$' + revenue.toFixed(0);
+            
+            // Calculate weekly growth for paid subscribers
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const historyBeforeWeek = paidSubscriberData.history
+                .filter(h => new Date(h.date) < startOfWeek)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const countAtWeekStart = historyBeforeWeek.length > 0 
+                ? historyBeforeWeek[0].total 
+                : paidSubscriberData.startCount;
+            
+            const weeklyGrowth = totalSubs - countAtWeekStart;
+            if (weeklyEl) weeklyEl.textContent = (weeklyGrowth >= 0 ? '+' : '') + weeklyGrowth.toLocaleString();
+
+            // Calculate monthly growth for paid subscribers
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            startOfMonth.setHours(0, 0, 0, 0);
+            
+            const historyBeforeMonth = paidSubscriberData.history
+                .filter(h => new Date(h.date) < startOfMonth)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const countAtMonthStart = historyBeforeMonth.length > 0 
+                ? historyBeforeMonth[0].total 
+                : paidSubscriberData.startCount;
+            
+            const monthlyGrowth = totalSubs - countAtMonthStart;
+            if (monthlyEl) monthlyEl.textContent = (monthlyGrowth >= 0 ? '+' : '') + monthlyGrowth.toLocaleString();
         }
 
         function renderAnalyticsGoals() {
@@ -9930,22 +10249,24 @@
             container.innerHTML = analyticsData.goals.map(goal => {
                 let progress, achieved, remaining, targetDisplay;
                 
+                // For goals, we track progress from startCount (initial fans don't count)
+                const fansGainedSinceStart = current - analyticsData.startCount;
+                
                 if (goal.deadline === '1 week') {
                     // Weekly goal: +100 fans from week start
                     const weekStartCount = getWeekStartCount();
-                    const weeklyTarget = weekStartCount + 100;
                     const gainedThisWeek = current - weekStartCount;
                     
-                    progress = Math.max(0, Math.min((gainedThisWeek / 100) * 100, 100));
-                    achieved = gainedThisWeek >= 100;
-                    remaining = 100 - gainedThisWeek;
-                    targetDisplay = weeklyTarget;
+                    progress = Math.max(0, Math.min((gainedThisWeek / goal.target) * 100, 100));
+                    achieved = gainedThisWeek >= goal.target;
+                    remaining = goal.target - gainedThisWeek;
+                    targetDisplay = `+${goal.target}`;
                 } else {
-                    // Other goals: fixed targets
-                    progress = Math.min((current / goal.target) * 100, 100);
-                    achieved = current >= goal.target;
-                    remaining = goal.target - current;
-                    targetDisplay = goal.target;
+                    // Other goals: track fans gained since start (not total fans)
+                    progress = Math.max(0, Math.min((fansGainedSinceStart / goal.target) * 100, 100));
+                    achieved = fansGainedSinceStart >= goal.target;
+                    remaining = goal.target - fansGainedSinceStart;
+                    targetDisplay = `+${goal.target.toLocaleString()}`;
                 }
 
                 return `
@@ -9956,7 +10277,7 @@
                                 ${goal.label} Goal
                             </div>
                             <div class="analytics-goal-target">
-                                Target: <span>${targetDisplay.toLocaleString()}</span> fans
+                                Target: <span>${targetDisplay}</span> fans
                             </div>
                         </div>
                         <div class="analytics-goal-progress">
@@ -9964,6 +10285,76 @@
                         </div>
                         <div class="analytics-goal-stats">
                             <span>${achieved ? '🎉 Goal achieved!' : `${Math.abs(remaining).toLocaleString()} to go`}</span>
+                            <span class="analytics-goal-percent">${progress.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPaidSubscriberGoals() {
+            const container = document.getElementById('paidSubscriberGoals');
+            if (!container) return;
+
+            const currentSubs = getTotalPaidSubscribers();
+            const currentRevenue = getMonthlyRevenue();
+            const now = new Date();
+            
+            // Get count at start of this week (Sunday midnight)
+            function getWeekStartCount() {
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                
+                const historyBeforeWeek = paidSubscriberData.history
+                    .filter(h => new Date(h.date) < weekStart)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                if (historyBeforeWeek.length > 0) {
+                    return historyBeforeWeek[0].total;
+                }
+                return currentSubs; // No history, start from current
+            }
+
+            container.innerHTML = paidSubscriberGoals.map(goal => {
+                let progress, achieved, remaining, targetDisplay;
+                
+                // For goals, we track progress from startCount (initial subs don't count)
+                const subsGainedSinceStart = currentSubs - paidSubscriberData.startCount;
+                
+                if (goal.deadline === '1 week') {
+                    // Weekly goal: +20 subscribers from week start
+                    const weekStartCount = getWeekStartCount();
+                    const gainedThisWeek = currentSubs - weekStartCount;
+                    
+                    progress = Math.max(0, Math.min((gainedThisWeek / goal.targetSubs) * 100, 100));
+                    achieved = gainedThisWeek >= goal.targetSubs;
+                    remaining = goal.targetSubs - gainedThisWeek;
+                    targetDisplay = `+${goal.targetSubs} subs / $${goal.targetRevenue}`;
+                } else {
+                    // Other goals: track subs gained since start (not total subs)
+                    progress = Math.max(0, Math.min((subsGainedSinceStart / goal.targetSubs) * 100, 100));
+                    achieved = subsGainedSinceStart >= goal.targetSubs;
+                    remaining = goal.targetSubs - subsGainedSinceStart;
+                    targetDisplay = `+${goal.targetSubs.toLocaleString()} subs / $${goal.targetRevenue.toLocaleString()}`;
+                }
+
+                return `
+                    <div class="analytics-goal ${achieved ? 'achieved' : ''}" style="border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="analytics-goal-header">
+                            <div class="analytics-goal-label">
+                                <span class="goal-icon">${achieved ? '✅' : goal.icon}</span>
+                                ${goal.label} Goal
+                            </div>
+                            <div class="analytics-goal-target">
+                                <span style="color: #8b5cf6;">${targetDisplay}</span>
+                            </div>
+                        </div>
+                        <div class="analytics-goal-progress">
+                            <div class="analytics-goal-progress-bar" style="width: ${progress}%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
+                        </div>
+                        <div class="analytics-goal-stats">
+                            <span>${achieved ? '🎉 Goal achieved!' : `${Math.abs(remaining).toLocaleString()} subs to go`}</span>
                             <span class="analytics-goal-percent">${progress.toFixed(1)}%</span>
                         </div>
                     </div>
@@ -10193,135 +10584,123 @@
             }
         });
 
-        // ========== SHOPIFY FUNCTIONS ==========
-        const refreshShopifyBtn = document.getElementById('refreshShopifyBtn');
-        
-        async function fetchShopifyData() {
-            const ordersContainer = document.getElementById('shopifyRecentOrders');
-            ordersContainer.innerHTML = '<div class="shopify-loading">Loading Shopify data...</div>';
+        // ========== PAID SUBSCRIBERS MODAL ==========
+        const updatePaidStatsBtn = document.getElementById('updatePaidStatsBtn');
+        const updatePaidStatsModal = document.getElementById('updatePaidStatsModal');
+        const closePaidStats = document.getElementById('closePaidStats');
+        const cancelPaidStats = document.getElementById('cancelPaidStats');
+        const savePaidStats = document.getElementById('savePaidStats');
+        const tier1Input = document.getElementById('tier1Count');
+        const tier2Input = document.getElementById('tier2Count');
+        const tier3Input = document.getElementById('tier3Count');
+        const paidPreviewTotal = document.getElementById('paidPreviewTotal');
+        const paidPreviewRevenue = document.getElementById('paidPreviewRevenue');
+
+        function updatePaidPreview() {
+            const t1 = parseInt(tier1Input.value) || 0;
+            const t2 = parseInt(tier2Input.value) || 0;
+            const t3 = parseInt(tier3Input.value) || 0;
+            const total = t1 + t2 + t3;
+            const revenue = (t1 * 0.99) + (t2 * 4.99) + (t3 * 9.99);
             
-            try {
-                // Use a CORS proxy since we're making client-side requests
-                // Note: For production, you'd want to use your own proxy or Firebase Function
-                const proxyUrl = 'https://corsproxy.io/?';
-                const shopifyUrl = `https://${SHOPIFY_CONFIG.store}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=50`;
-                
-                const ordersResponse = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
-                    headers: {
-                        'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!ordersResponse.ok) {
-                    throw new Error(`Shopify API error: ${ordersResponse.status}`);
-                }
-                
-                const ordersData = await ordersResponse.json();
-                const orders = ordersData.orders || [];
-                
-                // Calculate totals
-                let totalRevenue = 0;
-                let customerEmails = new Set();
-                
-                orders.forEach(order => {
-                    totalRevenue += parseFloat(order.total_price) || 0;
-                    if (order.email) customerEmails.add(order.email.toLowerCase());
-                });
-                
-                shopifyData.totalRevenue = totalRevenue;
-                shopifyData.totalOrders = orders.length;
-                shopifyData.totalCustomers = customerEmails.size;
-                shopifyData.avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
-                shopifyData.recentOrders = orders.slice(0, 5);
-                shopifyData.lastFetched = new Date().toISOString();
-                
-                // Save to Firebase
-                saveShopifyData();
-                
-                // Update UI
-                renderShopifyStats();
-                
-            } catch (error) {
-                console.error('Shopify fetch error:', error);
-                ordersContainer.innerHTML = `
-                    <div class="shopify-error">
-                        <p>Unable to connect to Shopify API</p>
-                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Error: ${error.message}</p>
-                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Using cached data if available...</p>
-                    </div>
-                `;
-                
-                // Try to load from Firebase
-                await loadShopifyData();
-                if (shopifyData.lastFetched) {
-                    renderShopifyStats();
-                }
-            }
+            if (paidPreviewTotal) paidPreviewTotal.textContent = total.toLocaleString();
+            if (paidPreviewRevenue) paidPreviewRevenue.textContent = '$' + revenue.toFixed(2);
         }
-        
-        function renderShopifyStats() {
-            // Update stat cards
-            document.getElementById('shopifyRevenue').textContent = '$' + shopifyData.totalRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            document.getElementById('shopifyOrders').textContent = shopifyData.totalOrders.toLocaleString();
-            document.getElementById('shopifyCustomers').textContent = shopifyData.totalCustomers.toLocaleString();
-            document.getElementById('shopifyAvgOrder').textContent = '$' + shopifyData.avgOrderValue.toFixed(2);
+
+        tier1Input?.addEventListener('input', updatePaidPreview);
+        tier2Input?.addEventListener('input', updatePaidPreview);
+        tier3Input?.addEventListener('input', updatePaidPreview);
+
+        updatePaidStatsBtn?.addEventListener('click', () => {
+            tier1Input.value = paidSubscriberData.tier1 || '';
+            tier2Input.value = paidSubscriberData.tier2 || '';
+            tier3Input.value = paidSubscriberData.tier3 || '';
+            updatePaidPreview();
+            updatePaidStatsModal.classList.add('open');
+            tier1Input.focus();
+        });
+
+        closePaidStats?.addEventListener('click', () => updatePaidStatsModal.classList.remove('open'));
+        cancelPaidStats?.addEventListener('click', () => updatePaidStatsModal.classList.remove('open'));
+
+        savePaidStats?.addEventListener('click', () => {
+            const t1 = parseInt(tier1Input.value) || 0;
+            const t2 = parseInt(tier2Input.value) || 0;
+            const t3 = parseInt(tier3Input.value) || 0;
             
-            // Render recent orders
-            const ordersContainer = document.getElementById('shopifyRecentOrders');
+            const previousTotal = getTotalPaidSubscribers();
             
-            if (shopifyData.recentOrders.length === 0) {
-                ordersContainer.innerHTML = '<div class="shopify-loading">No orders yet</div>';
-                return;
+            paidSubscriberData.tier1 = t1;
+            paidSubscriberData.tier2 = t2;
+            paidSubscriberData.tier3 = t3;
+            
+            const newTotal = getTotalPaidSubscribers();
+            const newRevenue = getMonthlyRevenue();
+            
+            // If this is the first save (startCount is 0), set startCount to current total
+            // This means the initial subs won't count toward goals
+            if (paidSubscriberData.startCount === 0 && newTotal > 0) {
+                paidSubscriberData.startCount = newTotal;
             }
             
-            ordersContainer.innerHTML = shopifyData.recentOrders.map(order => {
-                const date = new Date(order.created_at);
-                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const customerName = order.customer?.first_name || order.email?.split('@')[0] || 'Guest';
-                
-                return `
-                    <div class="shopify-order-item">
-                        <div class="shopify-order-info">
-                            <span class="shopify-order-number">#${order.order_number}</span>
-                            <span class="shopify-order-customer">${customerName}</span>
-                            <span class="shopify-order-date">${dateStr}</span>
-                        </div>
-                        <span class="shopify-order-amount">$${parseFloat(order.total_price).toFixed(2)}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function saveShopifyData() {
-            db.collection('planner').doc('shopifyData').set({
-                ...shopifyData,
+            // Add to history
+            paidSubscriberData.history.push({
+                date: new Date().toISOString(),
+                tier1: t1,
+                tier2: t2,
+                tier3: t3,
+                total: newTotal,
+                revenue: newRevenue,
+                previousTotal: previousTotal
+            });
+
+            savePaidSubscriberData();
+            renderAnalytics();
+            updatePaidStatsModal.classList.remove('open');
+        });
+
+        function savePaidSubscriberData() {
+            db.collection('planner').doc('paidSubscribers').set({
+                tier1: paidSubscriberData.tier1,
+                tier2: paidSubscriberData.tier2,
+                tier3: paidSubscriberData.tier3,
+                history: paidSubscriberData.history,
+                startDate: paidSubscriberData.startDate,
+                startCount: paidSubscriberData.startCount,
                 lastUpdated: new Date().toISOString()
             }).catch(error => {
-                console.error("Error saving Shopify data:", error);
+                console.error("Error saving paid subscriber data:", error);
             });
         }
-        
-        function loadShopifyData() {
-            return db.collection('planner').doc('shopifyData').get()
+
+        function loadPaidSubscriberData() {
+            return db.collection('planner').doc('paidSubscribers').get()
                 .then(doc => {
                     if (doc.exists) {
                         const data = doc.data();
-                        shopifyData.totalRevenue = data.totalRevenue || 0;
-                        shopifyData.totalOrders = data.totalOrders || 0;
-                        shopifyData.totalCustomers = data.totalCustomers || 0;
-                        shopifyData.avgOrderValue = data.avgOrderValue || 0;
-                        shopifyData.recentOrders = data.recentOrders || [];
-                        shopifyData.lastFetched = data.lastFetched || null;
+                        paidSubscriberData.tier1 = data.tier1 || 0;
+                        paidSubscriberData.tier2 = data.tier2 || 0;
+                        paidSubscriberData.tier3 = data.tier3 || 0;
+                        paidSubscriberData.history = data.history || [];
+                        paidSubscriberData.startDate = data.startDate || '2026-01-12';
+                        paidSubscriberData.startCount = data.startCount || 0;
+                        
+                        // Fix: If startCount is 0 but we have subs, set startCount to current total
+                        // This ensures initial subs don't count toward goals
+                        const currentTotal = paidSubscriberData.tier1 + paidSubscriberData.tier2 + paidSubscriberData.tier3;
+                        if (paidSubscriberData.startCount === 0 && currentTotal > 0) {
+                            paidSubscriberData.startCount = currentTotal;
+                            savePaidSubscriberData(); // Save the corrected startCount
+                        }
                     }
                 })
                 .catch(error => {
-                    console.error("Error loading Shopify data:", error);
+                    console.error("Error loading paid subscriber data:", error);
                 });
         }
-        
-        // Shopify refresh button handler
-        refreshShopifyBtn?.addEventListener('click', fetchShopifyData);
+
+        // ========== SHOPIFY FUNCTIONS (DISABLED FOR NOW) ==========
+        // Shopify integration will be re-enabled later
         
         // Notification settings modal handlers
         analyticsNotifyBtn?.addEventListener('click', () => {
@@ -10604,9 +10983,23 @@
                         const data = doc.data();
                         analyticsData.currentCount = data.currentCount || 2000;
                         analyticsData.history = data.history || [];
-                        if (data.goals) analyticsData.goals = data.goals;
                         if (data.startDate) analyticsData.startDate = data.startDate;
-                        if (data.startCount) analyticsData.startCount = data.startCount;
+                        // Default startCount to 1971 if not set
+                        analyticsData.startCount = data.startCount || 1971;
+                        
+                        // Always use the hardcoded goals (don't load from Firebase)
+                        // This ensures goals are always correct
+                        analyticsData.goals = [
+                            { id: 1, label: '1 Week', target: 100, deadline: '1 week', icon: '🎯' },
+                            { id: 2, label: '1 Month', target: 500, deadline: '1 month', icon: '📅' },
+                            { id: 3, label: '6 Months', target: 6000, deadline: '6 months', icon: '🚀' },
+                            { id: 4, label: '1 Year', target: 12000, deadline: '1 year', icon: '⭐' },
+                            { id: 5, label: '2 Years', target: 26000, deadline: '2 years', icon: '💎' },
+                            { id: 6, label: '3 Years', target: 52000, deadline: '3 years', icon: '👑' }
+                        ];
+                        
+                        // Save the corrected data
+                        saveAnalyticsData();
                     }
                 })
                 .catch(error => {
@@ -10638,7 +11031,7 @@
             await loadTodoData();
             await loadAnalyticsData();
             await loadAnalyticsNotifySettings();
-            await loadShopifyData();
+            await loadPaidSubscriberData();
             
             // Update category styles and populate dropdowns
             updateCategoryStyles();
@@ -10655,12 +11048,6 @@
             updateStats();
             updateRecentlyCompleted();
             updateWeeklyProgress();
-            
-            // Load Shopify data (render cached first, then fetch fresh)
-            if (shopifyData.lastFetched) {
-                renderShopifyStats();
-            }
-            fetchShopifyData(); // Fetch fresh data in background
             
             // Check if we need to send scheduled email
             checkAndSendScheduledEmail();
