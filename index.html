@@ -10750,25 +10750,60 @@
             }
 
             try {
-                // Note: Direct API calls from browser will be blocked by CORS
-                // We need to use a proxy or serverless function
-                // For now, we'll use a CORS proxy for demo purposes
-                
                 const proxyUrl = 'https://corsproxy.io/?';
-                const shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250`;
+                let allOrders = [];
+                let pageInfo = null;
+                let hasNextPage = true;
+                let pageCount = 0;
                 
-                const response = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
-                    headers: {
-                        'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken
+                // Paginate through all orders
+                while (hasNextPage && pageCount < 10) { // Max 10 pages (2500 orders) as safety limit
+                    pageCount++;
+                    
+                    let shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250`;
+                    
+                    // Add pagination cursor if we have one
+                    if (pageInfo) {
+                        shopifyUrl += `&page_info=${pageInfo}`;
                     }
-                });
+                    
+                    if (statusEl) {
+                        statusEl.querySelector('.shopify-status-text').textContent = `Loading page ${pageCount}...`;
+                    }
+                    
+                    const response = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
+                        headers: {
+                            'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken
+                        }
+                    });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const orders = data.orders || [];
+                    allOrders = allOrders.concat(orders);
+                    
+                    // Check for next page in Link header
+                    const linkHeader = response.headers.get('Link');
+                    if (linkHeader && linkHeader.includes('rel="next"')) {
+                        // Extract page_info from Link header
+                        const nextMatch = linkHeader.match(/page_info=([^>&]*)[^>]*>; rel="next"/);
+                        if (nextMatch) {
+                            pageInfo = nextMatch[1];
+                        } else {
+                            hasNextPage = false;
+                        }
+                    } else {
+                        hasNextPage = false;
+                    }
+                    
+                    // If we got fewer than 250, we're on the last page
+                    if (orders.length < 250) {
+                        hasNextPage = false;
+                    }
                 }
-
-                const data = await response.json();
-                const orders = data.orders || [];
 
                 // Calculate stats
                 const now = new Date();
@@ -10782,7 +10817,7 @@
                 let monthOrders = 0, monthRevenue = 0;
                 let allTimeOrders = 0, allTimeRevenue = 0;
 
-                orders.forEach(order => {
+                allOrders.forEach(order => {
                     const orderDate = new Date(order.created_at);
                     const revenue = parseFloat(order.total_price) || 0;
 
@@ -10820,7 +10855,7 @@
                 if (statusEl) {
                     statusEl.className = 'shopify-status connected';
                     statusEl.querySelector('.shopify-status-text').textContent = 
-                        `Last updated: ${new Date().toLocaleTimeString()}`;
+                        `Updated: ${new Date().toLocaleTimeString()} (${allTimeOrders} orders)`;
                 }
 
             } catch (error) {
