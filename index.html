@@ -10848,78 +10848,117 @@
             const ctx = canvas.getContext('2d');
             const container = canvas.parentElement;
             canvas.width = container.offsetWidth;
-            canvas.height = 300;
+            canvas.height = 280;
 
-            // Prepare data points
+            // Prepare data points from history
             let dataPoints = [{ date: new Date(analyticsData.startDate), count: analyticsData.startCount }];
             analyticsData.history.forEach(h => {
                 dataPoints.push({ date: new Date(h.date), count: h.count });
             });
+            
+            // Add current count as latest point
+            dataPoints.push({ date: new Date(), count: analyticsData.currentCount });
             dataPoints.sort((a, b) => a.date - b.date);
-
-            if (dataPoints.length < 2) {
-                // Add current as second point if no history
-                dataPoints.push({ date: new Date(), count: analyticsData.currentCount });
-            }
+            
+            // Remove duplicates (keep latest for each day)
+            const uniqueByDay = {};
+            dataPoints.forEach(p => {
+                const dayKey = p.date.toISOString().split('T')[0];
+                uniqueByDay[dayKey] = p;
+            });
+            dataPoints = Object.values(uniqueByDay).sort((a, b) => a.date - b.date);
 
             // Chart dimensions
-            const padding = { top: 20, right: 20, bottom: 40, left: 60 };
+            const padding = { top: 30, right: 30, bottom: 50, left: 70 };
             const chartWidth = canvas.width - padding.left - padding.right;
             const chartHeight = canvas.height - padding.top - padding.bottom;
 
-            // Calculate scales
-            const minCount = Math.min(...dataPoints.map(d => d.count)) * 0.9;
-            const maxCount = Math.max(...dataPoints.map(d => d.count), ...analyticsData.goals.map(g => g.target)) * 1.1;
+            // Calculate scales - focus on actual data range
+            const counts = dataPoints.map(d => d.count);
+            const minCount = Math.min(...counts);
+            const maxCount = Math.max(...counts);
+            const countRange = maxCount - minCount || 100;
+            const yMin = Math.max(0, minCount - countRange * 0.1);
+            const yMax = maxCount + countRange * 0.1;
+            
             const minDate = dataPoints[0].date;
             const maxDate = dataPoints[dataPoints.length - 1].date;
+            const dateRange = maxDate - minDate || 1;
 
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Draw background
             const isDark = document.body.dataset.theme !== 'light';
-            ctx.fillStyle = isDark ? '#1e1e22' : '#ffffff';
+            ctx.fillStyle = isDark ? '#1a1a1e' : '#fafafa';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw grid lines
-            ctx.strokeStyle = isDark ? '#27272a' : '#e5e7eb';
+            // Draw subtle grid lines
+            ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
             ctx.lineWidth = 1;
-            for (let i = 0; i <= 5; i++) {
-                const y = padding.top + (chartHeight / 5) * i;
+            
+            // Horizontal grid lines (5 lines)
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (chartHeight / 4) * i;
                 ctx.beginPath();
                 ctx.moveTo(padding.left, y);
                 ctx.lineTo(canvas.width - padding.right, y);
                 ctx.stroke();
 
                 // Y-axis labels
-                const value = maxCount - ((maxCount - minCount) / 5) * i;
-                ctx.fillStyle = isDark ? '#71717a' : '#6b7280';
-                ctx.font = '11px sans-serif';
+                const value = yMax - ((yMax - yMin) / 4) * i;
+                ctx.fillStyle = isDark ? '#71717a' : '#9ca3af';
+                ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
                 ctx.textAlign = 'right';
-                ctx.fillText(Math.round(value).toLocaleString(), padding.left - 10, y + 4);
+                ctx.fillText(Math.round(value).toLocaleString(), padding.left - 15, y + 4);
             }
 
-            // Draw goal lines
-            analyticsData.goals.forEach((goal, index) => {
-                if (goal.target <= maxCount && goal.target >= minCount) {
-                    const y = padding.top + chartHeight - ((goal.target - minCount) / (maxCount - minCount)) * chartHeight;
-                    ctx.strokeStyle = 'rgba(249, 115, 22, 0.3)';
-                    ctx.setLineDash([5, 5]);
-                    ctx.beginPath();
-                    ctx.moveTo(padding.left, y);
-                    ctx.lineTo(canvas.width - padding.right, y);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-
-                    // Goal label
-                    ctx.fillStyle = 'rgba(249, 115, 22, 0.7)';
-                    ctx.font = '10px sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.fillText(`${goal.label}: ${goal.target.toLocaleString()}`, padding.left + 5, y - 5);
+            // X-axis labels (show months)
+            ctx.fillStyle = isDark ? '#71717a' : '#9ca3af';
+            ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            
+            // Calculate month labels
+            const months = [];
+            let currentMonth = new Date(minDate);
+            currentMonth.setDate(1);
+            while (currentMonth <= maxDate) {
+                months.push(new Date(currentMonth));
+                currentMonth.setMonth(currentMonth.getMonth() + 1);
+            }
+            if (months.length === 0) months.push(minDate);
+            
+            months.forEach(monthDate => {
+                const x = padding.left + ((monthDate - minDate) / dateRange) * chartWidth;
+                if (x >= padding.left && x <= canvas.width - padding.right) {
+                    const label = monthDate.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+                    ctx.fillText(label, x, canvas.height - padding.bottom + 25);
                 }
             });
 
-            // Draw line chart
+            // Draw gradient fill under line first
+            const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
+            gradient.addColorStop(0, isDark ? 'rgba(249, 115, 22, 0.25)' : 'rgba(249, 115, 22, 0.15)');
+            gradient.addColorStop(1, 'rgba(249, 115, 22, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            dataPoints.forEach((point, i) => {
+                const x = padding.left + ((point.date - minDate) / dateRange) * chartWidth;
+                const y = padding.top + chartHeight - ((point.count - yMin) / (yMax - yMin)) * chartHeight;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.lineTo(padding.left + ((dataPoints[dataPoints.length-1].date - minDate) / dateRange) * chartWidth, padding.top + chartHeight);
+            ctx.lineTo(padding.left + ((dataPoints[0].date - minDate) / dateRange) * chartWidth, padding.top + chartHeight);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw smooth line
             ctx.strokeStyle = '#f97316';
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
@@ -10927,8 +10966,8 @@
             ctx.beginPath();
 
             dataPoints.forEach((point, i) => {
-                const x = padding.left + ((point.date - minDate) / (maxDate - minDate || 1)) * chartWidth;
-                const y = padding.top + chartHeight - ((point.count - minCount) / (maxCount - minCount)) * chartHeight;
+                const x = padding.left + ((point.date - minDate) / dateRange) * chartWidth;
+                const y = padding.top + chartHeight - ((point.count - yMin) / (yMax - yMin)) * chartHeight;
                 
                 if (i === 0) {
                     ctx.moveTo(x, y);
@@ -10938,43 +10977,47 @@
             });
             ctx.stroke();
 
-            // Draw gradient fill under line
-            const gradient = ctx.createLinearGradient(0, padding.top, 0, canvas.height - padding.bottom);
-            gradient.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
-            gradient.addColorStop(1, 'rgba(249, 115, 22, 0)');
-
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
+            // Draw data points (small dots)
             dataPoints.forEach((point, i) => {
-                const x = padding.left + ((point.date - minDate) / (maxDate - minDate || 1)) * chartWidth;
-                const y = padding.top + chartHeight - ((point.count - minCount) / (maxCount - minCount)) * chartHeight;
+                const x = padding.left + ((point.date - minDate) / dateRange) * chartWidth;
+                const y = padding.top + chartHeight - ((point.count - yMin) / (yMax - yMin)) * chartHeight;
                 
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-            ctx.lineTo(padding.left + chartWidth, padding.top + chartHeight);
-            ctx.lineTo(padding.left, padding.top + chartHeight);
-            ctx.closePath();
-            ctx.fill();
-
-            // Draw data points
-            dataPoints.forEach(point => {
-                const x = padding.left + ((point.date - minDate) / (maxDate - minDate || 1)) * chartWidth;
-                const y = padding.top + chartHeight - ((point.count - minCount) / (maxCount - minCount)) * chartHeight;
-                
+                // Outer circle
                 ctx.fillStyle = '#f97316';
                 ctx.beginPath();
                 ctx.arc(x, y, 5, 0, Math.PI * 2);
                 ctx.fill();
-
-                ctx.fillStyle = isDark ? '#1e1e22' : '#ffffff';
+                
+                // Inner circle (white/dark center)
+                ctx.fillStyle = isDark ? '#1a1a1e' : '#fafafa';
                 ctx.beginPath();
-                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.arc(x, y, 2.5, 0, Math.PI * 2);
                 ctx.fill();
             });
+
+            // Draw current value label at the end
+            const lastPoint = dataPoints[dataPoints.length - 1];
+            const lastX = padding.left + ((lastPoint.date - minDate) / dateRange) * chartWidth;
+            const lastY = padding.top + chartHeight - ((lastPoint.count - yMin) / (yMax - yMin)) * chartHeight;
+            
+            // Value badge
+            ctx.fillStyle = '#f97316';
+            const valueText = lastPoint.count.toLocaleString();
+            ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, sans-serif';
+            const textWidth = ctx.measureText(valueText).width;
+            const badgePadding = 8;
+            const badgeX = Math.min(lastX + 10, canvas.width - padding.right - textWidth - badgePadding * 2);
+            const badgeY = Math.max(lastY - 12, padding.top + 15);
+            
+            // Draw badge background
+            ctx.beginPath();
+            ctx.roundRect(badgeX, badgeY - 10, textWidth + badgePadding * 2, 22, 6);
+            ctx.fill();
+            
+            // Draw badge text
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            ctx.fillText(valueText, badgeX + badgePadding, badgeY + 5);
         }
 
         // Event listeners
