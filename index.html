@@ -11009,9 +11009,23 @@
             const badgeX = Math.min(lastX + 10, canvas.width - padding.right - textWidth - badgePadding * 2);
             const badgeY = Math.max(lastY - 12, padding.top + 15);
             
-            // Draw badge background
+            // Draw badge background (rounded rectangle - compatible version)
+            const badgeRadius = 6;
+            const badgeWidth = textWidth + badgePadding * 2;
+            const badgeHeight = 22;
+            const badgeTop = badgeY - 10;
+            
             ctx.beginPath();
-            ctx.roundRect(badgeX, badgeY - 10, textWidth + badgePadding * 2, 22, 6);
+            ctx.moveTo(badgeX + badgeRadius, badgeTop);
+            ctx.lineTo(badgeX + badgeWidth - badgeRadius, badgeTop);
+            ctx.quadraticCurveTo(badgeX + badgeWidth, badgeTop, badgeX + badgeWidth, badgeTop + badgeRadius);
+            ctx.lineTo(badgeX + badgeWidth, badgeTop + badgeHeight - badgeRadius);
+            ctx.quadraticCurveTo(badgeX + badgeWidth, badgeTop + badgeHeight, badgeX + badgeWidth - badgeRadius, badgeTop + badgeHeight);
+            ctx.lineTo(badgeX + badgeRadius, badgeTop + badgeHeight);
+            ctx.quadraticCurveTo(badgeX, badgeTop + badgeHeight, badgeX, badgeTop + badgeHeight - badgeRadius);
+            ctx.lineTo(badgeX, badgeTop + badgeRadius);
+            ctx.quadraticCurveTo(badgeX, badgeTop, badgeX + badgeRadius, badgeTop);
+            ctx.closePath();
             ctx.fill();
             
             // Draw badge text
