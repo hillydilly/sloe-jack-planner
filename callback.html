@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Authorization Callback</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #1a1a2e;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.75rem;
+        }
+        .error-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.75rem;
+        }
+        .code-section {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .code-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        .code-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            color: #1a1a2e;
+            word-break: break-all;
+            background: #ffffff;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .copy-btn {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+        .next-steps {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .next-steps h3 {
+            color: #92400e;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        .next-steps p {
+            color: #a16207;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .params-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 1.25rem;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="content">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const shop = urlParams.get('shop');
+        const hmac = urlParams.get('hmac');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+
+        const contentDiv = document.getElementById('content');
+
+        if (error) {
+            // Error occurred
+            contentDiv.innerHTML = `
+                <div class="header">
+                    <div class="error-icon">❌</div>
+                    <h1>Authorization Failed</h1>
+                    <p>There was a problem authorizing your app</p>
+                </div>
+                <div class="error-message">
+                    <strong>Error:</strong> ${error}<br>
+                    ${errorDescription ? `<strong>Details:</strong> ${errorDescription}` : ''}
+                </div>
+            `;
+        } else if (code) {
+            // Success! We have the authorization code
+            contentDiv.innerHTML = `
+                <div class="header">
+                    <div class="success-icon">✓</div>
+                    <h1>Authorization Successful!</h1>
+                    <p>Copy the authorization code below</p>
+                </div>
+                <div class="params-grid">
+                    <div class="code-section">
+                        <div class="code-label">Authorization Code</div>
+                        <div class="code-value" id="authCode">${code}</div>
+                        <button class="copy-btn" onclick="copyCode('${code}', this)">📋 Copy Authorization Code</button>
+                    </div>
+                    ${shop ? `
+                    <div class="code-section">
+                        <div class="code-label">Shop</div>
+                        <div class="code-value">${shop}</div>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="next-steps">
+                    <h3>⚡ Next Step</h3>
+                    <p>Copy the authorization code above and share it with Claude. We'll use it to get your permanent access token!</p>
+                </div>
+            `;
+        } else {
+            // No code or error - direct visit
+            contentDiv.innerHTML = `
+                <div class="header">
+                    <div class="error-icon">🔗</div>
+                    <h1>Waiting for Authorization</h1>
+                    <p>This page receives the Shopify OAuth callback</p>
+                </div>
+                <div class="next-steps">
+                    <h3>How to use this page</h3>
+                    <p>This page will automatically receive the authorization code when you complete the Shopify OAuth flow. You should be redirected here after authorizing the app.</p>
+                </div>
+            `;
+        }
+
+        function copyCode(code, btn) {
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Authorization Code';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
