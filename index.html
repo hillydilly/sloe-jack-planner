@@ -4639,6 +4639,103 @@
             color: var(--text-muted);
         }
 
+        /* Shopify Sales Section */
+        .shopify-section {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(150, 191, 72, 0.08) 100%);
+            border: 1px solid rgba(150, 191, 72, 0.2);
+        }
+
+        .shopify-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .shopify-stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .shopify-stat-period {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .shopify-stat-row {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+        }
+
+        .shopify-stat-item {
+            flex: 1;
+        }
+
+        .shopify-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #96bf48;
+        }
+
+        .shopify-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
+
+        .shopify-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .shopify-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .shopify-status.connected .shopify-status-dot {
+            background: #22c55e;
+        }
+
+        .shopify-status.loading .shopify-status-dot {
+            background: #f97316;
+            animation: pulse 1s infinite;
+        }
+
+        .shopify-status.error .shopify-status-dot {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .shopify-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .analytics-stats-row {
                 grid-template-columns: 1fr;
@@ -6214,6 +6311,59 @@
                     </div>
                     <div class="analytics-chart-container">
                         <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Shopify Sales Section -->
+                <div class="analytics-section shopify-section">
+                    <div class="analytics-section-header">
+                        <h2 class="analytics-section-title">🛒 Shopify Sales</h2>
+                        <button class="btn btn-secondary btn-sm" id="refreshShopifyBtn" title="Refresh data">🔄 Refresh</button>
+                    </div>
+                    <div class="shopify-stats-grid">
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-period">This Week</div>
+                            <div class="shopify-stat-row">
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyWeekOrders">-</div>
+                                    <div class="shopify-stat-label">Orders</div>
+                                </div>
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyWeekRevenue">-</div>
+                                    <div class="shopify-stat-label">Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-period">This Month</div>
+                            <div class="shopify-stat-row">
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyMonthOrders">-</div>
+                                    <div class="shopify-stat-label">Orders</div>
+                                </div>
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyMonthRevenue">-</div>
+                                    <div class="shopify-stat-label">Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-period">All Time</div>
+                            <div class="shopify-stat-row">
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyAllTimeOrders">-</div>
+                                    <div class="shopify-stat-label">Orders</div>
+                                </div>
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyAllTimeRevenue">-</div>
+                                    <div class="shopify-stat-label">Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shopify-status" id="shopifyStatus">
+                        <span class="shopify-status-dot"></span>
+                        <span class="shopify-status-text">Click refresh to load data</span>
                     </div>
                 </div>
 
@@ -10521,6 +10671,221 @@
             startCount: 1971
         };
 
+        // ========== SHOPIFY INTEGRATION ==========
+        const SHOPIFY_CONFIG = {
+            shop: 'dream-artists-5376.myshopify.com',
+            accessToken: null, // Loaded from Firebase for security
+            apiVersion: '2024-01'
+        };
+
+        let shopifyData = {
+            weekOrders: 0,
+            weekRevenue: 0,
+            monthOrders: 0,
+            monthRevenue: 0,
+            allTimeOrders: 0,
+            allTimeRevenue: 0,
+            lastUpdated: null
+        };
+
+        // Load Shopify token from Firebase (keeps it secure, not in code)
+        async function loadShopifyToken() {
+            try {
+                const doc = await db.collection('planner').doc('shopifyConfig').get();
+                if (doc.exists && doc.data().accessToken) {
+                    SHOPIFY_CONFIG.accessToken = doc.data().accessToken;
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error("Error loading Shopify token:", error);
+                return false;
+            }
+        }
+
+        // One-time function to save token to Firebase (run from console)
+        // Usage: saveShopifyToken('shpat_your_token_here')
+        window.saveShopifyToken = function(token) {
+            if (!token || !token.startsWith('shpat_')) {
+                console.error('Invalid token. Must start with shpat_');
+                return;
+            }
+            db.collection('planner').doc('shopifyConfig').set({
+                accessToken: token,
+                savedAt: new Date().toISOString()
+            }).then(() => {
+                console.log('✅ Shopify token saved securely to Firebase!');
+                console.log('You can now refresh the page and use the Shopify integration.');
+                SHOPIFY_CONFIG.accessToken = token;
+            }).catch(error => {
+                console.error('Error saving token:', error);
+            });
+        };
+
+        async function fetchShopifyOrders() {
+            const statusEl = document.getElementById('shopifyStatus');
+            
+            // Check if we have a token
+            if (!SHOPIFY_CONFIG.accessToken) {
+                const loaded = await loadShopifyToken();
+                if (!loaded) {
+                    if (statusEl) {
+                        statusEl.className = 'shopify-status error';
+                        statusEl.querySelector('.shopify-status-text').textContent = 
+                            'No API token configured. Open browser console for setup instructions.';
+                        console.log('='.repeat(60));
+                        console.log('SHOPIFY SETUP INSTRUCTIONS:');
+                        console.log('1. Get your access token');
+                        console.log('2. Open browser console (F12 or Cmd+Option+J)');
+                        console.log('3. Run: saveShopifyToken("shpat_your_token_here")');
+                        console.log('='.repeat(60));
+                    }
+                    return;
+                }
+            }
+
+            if (statusEl) {
+                statusEl.className = 'shopify-status loading';
+                statusEl.querySelector('.shopify-status-text').textContent = 'Loading data...';
+            }
+
+            try {
+                // Note: Direct API calls from browser will be blocked by CORS
+                // We need to use a proxy or serverless function
+                // For now, we'll use a CORS proxy for demo purposes
+                
+                const proxyUrl = 'https://corsproxy.io/?';
+                const shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250`;
+                
+                const response = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
+                    headers: {
+                        'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const orders = data.orders || [];
+
+                // Calculate stats
+                const now = new Date();
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                let weekOrders = 0, weekRevenue = 0;
+                let monthOrders = 0, monthRevenue = 0;
+                let allTimeOrders = 0, allTimeRevenue = 0;
+
+                orders.forEach(order => {
+                    const orderDate = new Date(order.created_at);
+                    const revenue = parseFloat(order.total_price) || 0;
+
+                    // All time
+                    allTimeOrders++;
+                    allTimeRevenue += revenue;
+
+                    // This month
+                    if (orderDate >= startOfMonth) {
+                        monthOrders++;
+                        monthRevenue += revenue;
+                    }
+
+                    // This week
+                    if (orderDate >= startOfWeek) {
+                        weekOrders++;
+                        weekRevenue += revenue;
+                    }
+                });
+
+                shopifyData = {
+                    weekOrders,
+                    weekRevenue,
+                    monthOrders,
+                    monthRevenue,
+                    allTimeOrders,
+                    allTimeRevenue,
+                    lastUpdated: new Date().toISOString()
+                };
+
+                // Save to Firebase
+                saveShopifyData();
+                renderShopifyStats();
+
+                if (statusEl) {
+                    statusEl.className = 'shopify-status connected';
+                    statusEl.querySelector('.shopify-status-text').textContent = 
+                        `Last updated: ${new Date().toLocaleTimeString()}`;
+                }
+
+            } catch (error) {
+                console.error('Shopify API error:', error);
+                
+                // Try to load cached data from Firebase
+                await loadShopifyData();
+                renderShopifyStats();
+
+                if (statusEl) {
+                    statusEl.className = 'shopify-status error';
+                    statusEl.querySelector('.shopify-status-text').textContent = 
+                        shopifyData.lastUpdated 
+                            ? `Using cached data from ${new Date(shopifyData.lastUpdated).toLocaleDateString()}`
+                            : 'Could not connect - CORS proxy may be blocked';
+                }
+            }
+        }
+
+        function renderShopifyStats() {
+            const weekOrdersEl = document.getElementById('shopifyWeekOrders');
+            const weekRevenueEl = document.getElementById('shopifyWeekRevenue');
+            const monthOrdersEl = document.getElementById('shopifyMonthOrders');
+            const monthRevenueEl = document.getElementById('shopifyMonthRevenue');
+            const allTimeOrdersEl = document.getElementById('shopifyAllTimeOrders');
+            const allTimeRevenueEl = document.getElementById('shopifyAllTimeRevenue');
+
+            if (weekOrdersEl) weekOrdersEl.textContent = shopifyData.weekOrders.toLocaleString();
+            if (weekRevenueEl) weekRevenueEl.textContent = '$' + shopifyData.weekRevenue.toFixed(0);
+            if (monthOrdersEl) monthOrdersEl.textContent = shopifyData.monthOrders.toLocaleString();
+            if (monthRevenueEl) monthRevenueEl.textContent = '$' + shopifyData.monthRevenue.toFixed(0);
+            if (allTimeOrdersEl) allTimeOrdersEl.textContent = shopifyData.allTimeOrders.toLocaleString();
+            if (allTimeRevenueEl) allTimeRevenueEl.textContent = '$' + shopifyData.allTimeRevenue.toFixed(0);
+        }
+
+        function saveShopifyData() {
+            db.collection('planner').doc('shopifyData').set({
+                ...shopifyData,
+                savedAt: new Date().toISOString()
+            }).catch(error => {
+                console.error("Error saving Shopify data:", error);
+            });
+        }
+
+        function loadShopifyData() {
+            return db.collection('planner').doc('shopifyData').get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        shopifyData = {
+                            weekOrders: data.weekOrders || 0,
+                            weekRevenue: data.weekRevenue || 0,
+                            monthOrders: data.monthOrders || 0,
+                            monthRevenue: data.monthRevenue || 0,
+                            allTimeOrders: data.allTimeOrders || 0,
+                            allTimeRevenue: data.allTimeRevenue || 0,
+                            lastUpdated: data.lastUpdated || null
+                        };
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading Shopify data:", error);
+                });
+        }
+
         // ========== PAID SUBSCRIBERS ==========
         let paidSubscriberData = {
             tier1: 0,  // $0.99/month
@@ -11086,6 +11451,12 @@
             ctx.textAlign = 'left';
             ctx.fillText(valueText, badgeX + badgePadding, badgeY + 5);
         }
+
+        // Shopify refresh button
+        const refreshShopifyBtn = document.getElementById('refreshShopifyBtn');
+        refreshShopifyBtn?.addEventListener('click', () => {
+            fetchShopifyOrders();
+        });
 
         // Event listeners
         updateStatsBtn?.addEventListener('click', () => {
@@ -11673,6 +12044,7 @@
             await loadAnalyticsData();
             await loadAnalyticsNotifySettings();
             await loadPaidSubscriberData();
+            await loadShopifyData();
             
             // Update category styles and populate dropdowns
             updateCategoryStyles();
@@ -11685,6 +12057,7 @@
             renderDailyHabits();
             renderTodoList();
             renderAnalytics();
+            renderShopifyStats();
             updateComingUp();
             updateStats();
             updateRecentlyCompleted();
