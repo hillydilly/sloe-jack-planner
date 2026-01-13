@@ -10657,6 +10657,11 @@
             savePaidSubscriberData();
             renderAnalytics();
             updatePaidStatsModal.classList.remove('open');
+            
+            // Check for paid subscriber goal achievements
+            if (analyticsNotifySettings.goalReached) {
+                checkPaidSubscriberGoalAchievements(previousTotal, newTotal, newRevenue);
+            }
         });
 
         function savePaidSubscriberData() {
@@ -10960,6 +10965,90 @@
                 console.log('Goal achievement notification sent!');
             } catch (error) {
                 console.error('Failed to send goal achievement notification:', error);
+            }
+        }
+
+        // ========== PAID SUBSCRIBER GOAL NOTIFICATIONS ==========
+        function checkPaidSubscriberGoalAchievements(previousTotal, newTotal, newRevenue) {
+            // Calculate gains from startCount
+            const previousGain = previousTotal - paidSubscriberData.startCount;
+            const newGain = newTotal - paidSubscriberData.startCount;
+            
+            paidSubscriberGoals.forEach(goal => {
+                // Check if we just crossed the threshold
+                if (previousGain < goal.targetSubs && newGain >= goal.targetSubs) {
+                    // Goal just achieved!
+                    setTimeout(() => {
+                        alert(`🎉 Congratulations! You've reached your ${goal.label} Paid Subscriber goal of +${goal.targetSubs} subscribers!`);
+                    }, 500);
+                    
+                    // Send goal achievement email
+                    sendPaidSubscriberGoalNotification(goal, newTotal, newRevenue);
+                }
+            });
+        }
+        
+        async function sendPaidSubscriberGoalNotification(goal, totalSubs, monthlyRevenue) {
+            const emailHtml = `
+                <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px; border-radius: 16px 16px 0 0; text-align: center;">
+                        <div style="display: inline-block; background: linear-gradient(135deg, #8b5cf6, #7c3aed); padding: 12px 20px; border-radius: 12px; margin-bottom: 16px;">
+                            <span style="color: white; font-weight: 700; font-size: 18px;">💎</span>
+                        </div>
+                        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🎉 Paid Subscriber Goal Achieved!</h1>
+                        <p style="color: #9ca3af; margin: 8px 0 0 0; font-size: 14px;">SLOE JACK Fan Analytics</p>
+                    </div>
+                    
+                    <!-- Goal Card -->
+                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 32px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 8px;">${goal.icon}</div>
+                        <div style="font-size: 24px; font-weight: 700; color: white; margin-bottom: 4px;">${goal.label} Goal</div>
+                        <div style="font-size: 36px; font-weight: 800; color: white;">+${goal.targetSubs} Subscribers</div>
+                        <div style="font-size: 18px; color: rgba(255,255,255,0.9); margin-top: 8px;">$${goal.targetRevenue.toLocaleString()}/month target</div>
+                    </div>
+                    
+                    <!-- Details -->
+                    <div style="background: #ffffff; padding: 24px; text-align: center;">
+                        <div style="font-size: 18px; color: #1f2937; margin-bottom: 16px;">
+                            You now have <strong style="color: #8b5cf6;">${totalSubs.toLocaleString()}</strong> paid subscribers!
+                        </div>
+                        <div style="font-size: 16px; color: #4b5563; margin-bottom: 16px;">
+                            Monthly recurring revenue: <strong style="color: #8b5cf6;">$${monthlyRevenue.toFixed(2)}</strong>
+                        </div>
+                        <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                            You crushed your ${goal.label.toLowerCase()} paid subscriber goal! The fan support is real! 💜
+                        </p>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="background: #1f2937; padding: 24px; border-radius: 0 0 16px 16px; text-align: center;">
+                        <p style="color: #9ca3af; margin: 0; font-size: 13px;">
+                            📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                        </p>
+                        <p style="color: #6b7280; margin: 12px 0 0 0; font-size: 12px;">
+                            Keep building that paid community! 🎸💎
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            const templateParams = {
+                to_email: analyticsNotifySettings.email || 'hillardc@gmail.com',
+                subject: `💎 Paid Subscriber Goal Achieved: +${goal.targetSubs} Subs! (${goal.label})`,
+                message_html: emailHtml
+            };
+            
+            try {
+                await emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.templateId,
+                    templateParams,
+                    EMAILJS_CONFIG.publicKey
+                );
+                console.log('Paid subscriber goal notification sent!');
+            } catch (error) {
+                console.error('Failed to send paid subscriber goal notification:', error);
             }
         }
 
