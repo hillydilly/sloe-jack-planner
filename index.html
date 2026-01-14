@@ -10695,6 +10695,14 @@
             allTimeRevenue: 0,
             lastUpdated: null
         };
+        
+        // Baseline data from CSV export (set once, then API adds recent orders)
+        // This is needed because CORS proxy limits how many orders we can fetch
+        const SHOPIFY_BASELINE = {
+            asOfDate: '2026-01-14',  // Date the CSV was exported
+            totalOrders: 366,
+            totalRevenue: 11983.53
+        };
 
         // Load Shopify token from Firebase (keeps it secure, not in code)
         async function loadShopifyToken() {
@@ -10814,18 +10822,24 @@
                 startOfWeek.setHours(0, 0, 0, 0);
 
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                
+                // Baseline date for calculating new orders since CSV export
+                const baselineDate = new Date(SHOPIFY_BASELINE.asOfDate);
+                baselineDate.setHours(23, 59, 59, 999);
 
                 let weekOrders = 0, weekRevenue = 0;
                 let monthOrders = 0, monthRevenue = 0;
-                let allTimeOrders = 0, allTimeRevenue = 0;
+                let newOrdersSinceBaseline = 0, newRevenueSinceBaseline = 0;
 
                 allOrders.forEach(order => {
                     const orderDate = new Date(order.created_at);
                     const revenue = parseFloat(order.total_price) || 0;
 
-                    // All time
-                    allTimeOrders++;
-                    allTimeRevenue += revenue;
+                    // Count orders after baseline date (new orders since CSV)
+                    if (orderDate > baselineDate) {
+                        newOrdersSinceBaseline++;
+                        newRevenueSinceBaseline += revenue;
+                    }
 
                     // This month
                     if (orderDate >= startOfMonth) {
@@ -10839,6 +10853,10 @@
                         weekRevenue += revenue;
                     }
                 });
+                
+                // All time = baseline + new orders since baseline
+                const allTimeOrders = SHOPIFY_BASELINE.totalOrders + newOrdersSinceBaseline;
+                const allTimeRevenue = SHOPIFY_BASELINE.totalRevenue + newRevenueSinceBaseline;
 
                 shopifyData = {
                     weekOrders,
@@ -10857,7 +10875,7 @@
                 if (statusEl) {
                     statusEl.className = 'shopify-status connected';
                     statusEl.querySelector('.shopify-status-text').textContent = 
-                        `Updated: ${new Date().toLocaleTimeString()} (${allTimeOrders} orders)`;
+                        `Updated: ${new Date().toLocaleTimeString()}`;
                 }
 
             } catch (error) {
