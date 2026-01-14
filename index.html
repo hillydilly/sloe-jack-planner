@@ -4658,6 +4658,11 @@
             text-align: center;
         }
 
+        .shopify-stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
         .shopify-stat-period {
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -6284,6 +6289,62 @@
                     </div>
                 </div>
 
+                <!-- Shopify Sales Section -->
+                <div class="analytics-section shopify-section">
+                    <div class="analytics-section-header">
+                        <h2 class="analytics-section-title">🛒 Shopify Sales</h2>
+                        <button class="btn btn-secondary btn-sm" id="refreshShopifyBtn" title="Refresh data">🔄 Refresh</button>
+                    </div>
+                    <div class="shopify-stats-grid">
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">📅</div>
+                            <div class="shopify-stat-period">This Week</div>
+                            <div class="shopify-stat-row">
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyWeekOrders">-</div>
+                                    <div class="shopify-stat-label">🛍️ Orders</div>
+                                </div>
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyWeekRevenue">-</div>
+                                    <div class="shopify-stat-label">💵 Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">📆</div>
+                            <div class="shopify-stat-period">This Month</div>
+                            <div class="shopify-stat-row">
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyMonthOrders">-</div>
+                                    <div class="shopify-stat-label">🛍️ Orders</div>
+                                </div>
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyMonthRevenue">-</div>
+                                    <div class="shopify-stat-label">💵 Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shopify-stat-card">
+                            <div class="shopify-stat-icon">🏆</div>
+                            <div class="shopify-stat-period">All Time</div>
+                            <div class="shopify-stat-row">
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyAllTimeOrders">-</div>
+                                    <div class="shopify-stat-label">🛍️ Orders</div>
+                                </div>
+                                <div class="shopify-stat-item">
+                                    <div class="shopify-stat-value" id="shopifyAllTimeRevenue">-</div>
+                                    <div class="shopify-stat-label">💵 Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="shopify-status" id="shopifyStatus">
+                        <span class="shopify-status-dot"></span>
+                        <span class="shopify-status-text">Click refresh to load data</span>
+                    </div>
+                </div>
+
                 <!-- Goals Section - Split View -->
                 <div class="analytics-goals-split">
                     <div class="analytics-section goals-column">
@@ -6311,59 +6372,6 @@
                     </div>
                     <div class="analytics-chart-container">
                         <canvas id="growthChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Shopify Sales Section -->
-                <div class="analytics-section shopify-section">
-                    <div class="analytics-section-header">
-                        <h2 class="analytics-section-title">🛒 Shopify Sales</h2>
-                        <button class="btn btn-secondary btn-sm" id="refreshShopifyBtn" title="Refresh data">🔄 Refresh</button>
-                    </div>
-                    <div class="shopify-stats-grid">
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-period">This Week</div>
-                            <div class="shopify-stat-row">
-                                <div class="shopify-stat-item">
-                                    <div class="shopify-stat-value" id="shopifyWeekOrders">-</div>
-                                    <div class="shopify-stat-label">Orders</div>
-                                </div>
-                                <div class="shopify-stat-item">
-                                    <div class="shopify-stat-value" id="shopifyWeekRevenue">-</div>
-                                    <div class="shopify-stat-label">Revenue</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-period">This Month</div>
-                            <div class="shopify-stat-row">
-                                <div class="shopify-stat-item">
-                                    <div class="shopify-stat-value" id="shopifyMonthOrders">-</div>
-                                    <div class="shopify-stat-label">Orders</div>
-                                </div>
-                                <div class="shopify-stat-item">
-                                    <div class="shopify-stat-value" id="shopifyMonthRevenue">-</div>
-                                    <div class="shopify-stat-label">Revenue</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="shopify-stat-card">
-                            <div class="shopify-stat-period">All Time</div>
-                            <div class="shopify-stat-row">
-                                <div class="shopify-stat-item">
-                                    <div class="shopify-stat-value" id="shopifyAllTimeOrders">-</div>
-                                    <div class="shopify-stat-label">Orders</div>
-                                </div>
-                                <div class="shopify-stat-item">
-                                    <div class="shopify-stat-value" id="shopifyAllTimeRevenue">-</div>
-                                    <div class="shopify-stat-label">Revenue</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="shopify-status" id="shopifyStatus">
-                        <span class="shopify-status-dot"></span>
-                        <span class="shopify-status-text">Click refresh to load data</span>
                     </div>
                 </div>
 
@@ -10752,19 +10760,18 @@
             try {
                 const proxyUrl = 'https://corsproxy.io/?';
                 let allOrders = [];
-                let pageInfo = null;
-                let hasNextPage = true;
+                let sinceId = 0;
+                let hasMore = true;
                 let pageCount = 0;
                 
-                // Paginate through all orders
-                while (hasNextPage && pageCount < 10) { // Max 10 pages (2500 orders) as safety limit
+                // Paginate through all orders using since_id
+                while (hasMore && pageCount < 20) { // Max 20 pages (5000 orders) as safety limit
                     pageCount++;
                     
-                    let shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250`;
+                    let shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250&order=id asc`;
                     
-                    // Add pagination cursor if we have one
-                    if (pageInfo) {
-                        shopifyUrl += `&page_info=${pageInfo}`;
+                    if (sinceId > 0) {
+                        shopifyUrl += `&since_id=${sinceId}`;
                     }
                     
                     if (statusEl) {
@@ -10783,27 +10790,22 @@
 
                     const data = await response.json();
                     const orders = data.orders || [];
-                    allOrders = allOrders.concat(orders);
                     
-                    // Check for next page in Link header
-                    const linkHeader = response.headers.get('Link');
-                    if (linkHeader && linkHeader.includes('rel="next"')) {
-                        // Extract page_info from Link header
-                        const nextMatch = linkHeader.match(/page_info=([^>&]*)[^>]*>; rel="next"/);
-                        if (nextMatch) {
-                            pageInfo = nextMatch[1];
-                        } else {
-                            hasNextPage = false;
-                        }
+                    if (orders.length === 0) {
+                        hasMore = false;
                     } else {
-                        hasNextPage = false;
-                    }
-                    
-                    // If we got fewer than 250, we're on the last page
-                    if (orders.length < 250) {
-                        hasNextPage = false;
+                        allOrders = allOrders.concat(orders);
+                        // Get the last order's ID for next page
+                        sinceId = orders[orders.length - 1].id;
+                        
+                        // If we got fewer than 250, we're on the last page
+                        if (orders.length < 250) {
+                            hasMore = false;
+                        }
                     }
                 }
+                
+                console.log(`Fetched ${allOrders.length} total orders`);
 
                 // Calculate stats
                 const now = new Date();
