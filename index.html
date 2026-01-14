@@ -4148,6 +4148,32 @@
             color: #8b5cf6;
         }
 
+        .analytics-total-card.revenue {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(34, 197, 94, 0.15) 100%);
+            border-color: #22c55e;
+        }
+
+        .analytics-total-card.revenue .analytics-total-value {
+            color: #22c55e;
+        }
+
+        .combined-revenue-section {
+            margin-top: 1rem;
+        }
+
+        .analytics-stats-label.revenue {
+            color: #22c55e;
+        }
+
+        .analytics-mini-stat.revenue {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(34, 197, 94, 0.08) 100%);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .analytics-mini-stat.revenue .mini-stat-value {
+            color: #22c55e;
+        }
+
         .analytics-stats-grid {
             flex: 1;
             display: grid;
@@ -6285,6 +6311,27 @@
                             <div class="mini-stat-label">Monthly Rev</div>
                             <div class="mini-stat-value" id="monthlyRevenue">$0</div>
                             <div class="mini-stat-sub">recurring</div>
+                        </div>
+                        
+                        <!-- Combined Revenue Row -->
+                        <div class="analytics-stats-label revenue">💵 Total Revenue</div>
+                        <div class="analytics-mini-stat revenue">
+                            <div class="mini-stat-icon">📅</div>
+                            <div class="mini-stat-label">This Month</div>
+                            <div class="mini-stat-value" id="combinedMonthRevenue">$0</div>
+                            <div class="mini-stat-sub">total</div>
+                        </div>
+                        <div class="analytics-mini-stat revenue">
+                            <div class="mini-stat-icon">📆</div>
+                            <div class="mini-stat-label">This Year</div>
+                            <div class="mini-stat-value" id="combinedYearRevenue">$0</div>
+                            <div class="mini-stat-sub">total</div>
+                        </div>
+                        <div class="analytics-mini-stat revenue">
+                            <div class="mini-stat-icon">🏆</div>
+                            <div class="mini-stat-label">All Time</div>
+                            <div class="mini-stat-value" id="combinedAllTimeRevenueSmall">$0</div>
+                            <div class="mini-stat-sub">total</div>
                         </div>
                     </div>
                 </div>
@@ -10691,6 +10738,8 @@
             weekRevenue: 0,
             monthOrders: 0,
             monthRevenue: 0,
+            yearOrders: 0,
+            yearRevenue: 0,
             allTimeOrders: 0,
             allTimeRevenue: 0,
             lastUpdated: null
@@ -10701,7 +10750,10 @@
         const SHOPIFY_BASELINE = {
             asOfDate: '2026-01-14',  // Date the CSV was exported
             totalOrders: 366,
-            totalRevenue: 11983.53
+            totalRevenue: 11983.53,
+            // 2026 fiscal year data (Jan 1, 2026 onwards)
+            year2026Orders: 2,
+            year2026Revenue: 152.46
         };
 
         // Load Shopify token from Firebase (keeps it secure, not in code)
@@ -10823,12 +10875,17 @@
 
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                 
+                // Start of current year (Jan 1, 2026)
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                startOfYear.setHours(0, 0, 0, 0);
+                
                 // Baseline date for calculating new orders since CSV export
                 const baselineDate = new Date(SHOPIFY_BASELINE.asOfDate);
                 baselineDate.setHours(23, 59, 59, 999);
 
                 let weekOrders = 0, weekRevenue = 0;
                 let monthOrders = 0, monthRevenue = 0;
+                let yearOrders = 0, yearRevenue = 0;
                 let newOrdersSinceBaseline = 0, newRevenueSinceBaseline = 0;
 
                 allOrders.forEach(order => {
@@ -10839,6 +10896,12 @@
                     if (orderDate > baselineDate) {
                         newOrdersSinceBaseline++;
                         newRevenueSinceBaseline += revenue;
+                    }
+
+                    // This year (2026)
+                    if (orderDate >= startOfYear) {
+                        yearOrders++;
+                        yearRevenue += revenue;
                     }
 
                     // This month
@@ -10857,12 +10920,18 @@
                 // All time = baseline + new orders since baseline
                 const allTimeOrders = SHOPIFY_BASELINE.totalOrders + newOrdersSinceBaseline;
                 const allTimeRevenue = SHOPIFY_BASELINE.totalRevenue + newRevenueSinceBaseline;
+                
+                // Year 2026 = baseline year data + new orders since baseline (all new orders are in 2026)
+                const finalYearOrders = SHOPIFY_BASELINE.year2026Orders + newOrdersSinceBaseline;
+                const finalYearRevenue = SHOPIFY_BASELINE.year2026Revenue + newRevenueSinceBaseline;
 
                 shopifyData = {
                     weekOrders,
                     weekRevenue,
                     monthOrders,
                     monthRevenue,
+                    yearOrders: finalYearOrders,
+                    yearRevenue: finalYearRevenue,
                     allTimeOrders,
                     allTimeRevenue,
                     lastUpdated: new Date().toISOString()
@@ -10909,6 +10978,54 @@
             if (monthRevenueEl) monthRevenueEl.textContent = '$' + shopifyData.monthRevenue.toFixed(0);
             if (allTimeOrdersEl) allTimeOrdersEl.textContent = shopifyData.allTimeOrders.toLocaleString();
             if (allTimeRevenueEl) allTimeRevenueEl.textContent = '$' + shopifyData.allTimeRevenue.toFixed(0);
+            
+            // Update combined revenue display
+            renderCombinedRevenue();
+        }
+
+        function renderCombinedRevenue() {
+            // Get paid subscriber revenue (monthly recurring)
+            const monthlySubRevenue = getMonthlyRevenue();
+            
+            // For all-time, estimate based on history
+            const paidSubsAllTime = calculatePaidSubsAllTimeRevenue();
+            
+            // Paid subs this year (2026) - estimate based on current month since paid subs started in 2026
+            const paidSubsYearRevenue = calculatePaidSubsAllTimeRevenue(); // Same as all-time since started in 2026
+            
+            // Combine with Shopify data
+            const combinedMonth = shopifyData.monthRevenue + monthlySubRevenue;
+            const combinedYear = (shopifyData.yearRevenue || 0) + paidSubsYearRevenue; // 2026 only
+            const combinedAllTime = (shopifyData.allTimeRevenue || 0) + paidSubsAllTime;
+            
+            // Update display
+            const monthEl = document.getElementById('combinedMonthRevenue');
+            const yearEl = document.getElementById('combinedYearRevenue');
+            const allTimeSmallEl = document.getElementById('combinedAllTimeRevenueSmall');
+            
+            if (monthEl) monthEl.textContent = '$' + combinedMonth.toLocaleString(undefined, {maximumFractionDigits: 0});
+            if (yearEl) yearEl.textContent = '$' + combinedYear.toLocaleString(undefined, {maximumFractionDigits: 0});
+            if (allTimeSmallEl) allTimeSmallEl.textContent = '$' + combinedAllTime.toLocaleString(undefined, {maximumFractionDigits: 0});
+        }
+
+        function calculatePaidSubsAllTimeRevenue() {
+            // Calculate estimated all-time revenue from paid subscribers
+            // This is an estimate based on history entries
+            let totalRevenue = 0;
+            
+            if (paidSubscriberData.history && paidSubscriberData.history.length > 0) {
+                // Sum up revenue from each history entry (monthly snapshots)
+                paidSubscriberData.history.forEach(entry => {
+                    if (entry.revenue) {
+                        totalRevenue += entry.revenue;
+                    }
+                });
+            }
+            
+            // Add current month's revenue
+            totalRevenue = Math.max(totalRevenue, getMonthlyRevenue());
+            
+            return totalRevenue;
         }
 
         function saveShopifyData() {
@@ -10930,6 +11047,8 @@
                             weekRevenue: data.weekRevenue || 0,
                             monthOrders: data.monthOrders || 0,
                             monthRevenue: data.monthRevenue || 0,
+                            yearOrders: data.yearOrders || 0,
+                            yearRevenue: data.yearRevenue || 0,
                             allTimeOrders: data.allTimeOrders || 0,
                             allTimeRevenue: data.allTimeRevenue || 0,
                             lastUpdated: data.lastUpdated || null
@@ -11102,6 +11221,9 @@
             
             const monthlyGrowth = totalSubs - countAtMonthStart;
             if (monthlyEl) monthlyEl.textContent = (monthlyGrowth >= 0 ? '+' : '') + monthlyGrowth.toLocaleString();
+            
+            // Update combined revenue when paid sub stats change
+            renderCombinedRevenue();
         }
 
         function renderAnalyticsGoals() {
