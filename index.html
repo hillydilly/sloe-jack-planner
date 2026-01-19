@@ -1417,6 +1417,103 @@
             line-height: 1.5;
         }
 
+        /* Email Notification Cards */
+        .email-notif-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .email-notif-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+        }
+
+        .email-notif-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .email-notif-icon {
+            font-size: 1.75rem;
+        }
+
+        .email-notif-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .email-notif-schedule {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .email-notif-content {
+            padding: 1rem;
+        }
+
+        .email-notif-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .email-notif-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .email-check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            font-size: 0.875rem;
+        }
+
+        .email-check-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .email-check-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .email-check-item span {
+            color: var(--text-primary);
+        }
+
+        .email-check-item input[type="checkbox"]:not(:checked) + span {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .email-test-btn {
+            margin: 0 1rem 1rem 1rem;
+            width: calc(100% - 2rem);
+        }
+
         .notification-setting-item {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
@@ -4856,6 +4953,54 @@
             background-color: white;
         }
 
+        /* General toggle switch for settings modals */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--accent-primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            background-color: white;
+        }
+
         .notification-close-mobile {
             display: none;
         }
@@ -6849,114 +6994,133 @@
 
     <!-- Notification Settings Modal -->
     <div class="modal-overlay" id="notificationSettingsModal">
-        <div class="modal">
+        <div class="modal" style="max-width: 550px;">
             <div class="modal-header">
-                <h3 class="modal-title">🔔 Notification Settings</h3>
+                <h3 class="modal-title">🔔 Email Notifications</h3>
                 <button class="auto-panel-close" id="closeNotificationSettings">✕</button>
             </div>
-            <div class="modal-body">
-                <p class="notification-settings-desc">Configure when tasks should appear in your "Due Now" notifications:</p>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                 
-                <div class="notification-setting-item">
-                    <div class="notification-setting-info">
-                        <div class="notification-setting-icon">📆</div>
-                        <div>
-                            <div class="notification-setting-title">Weekly Tasks</div>
-                            <div class="notification-setting-subtitle">Remind me when there are this many days left in the week</div>
+                <!-- Friday Email Section -->
+                <div class="email-notif-card">
+                    <div class="email-notif-header">
+                        <div class="email-notif-title-row">
+                            <div class="email-notif-icon">📅</div>
+                            <div>
+                                <div class="email-notif-title">Friday Progress Check</div>
+                                <div class="email-notif-schedule">Every Friday at 5:00 PM CT</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="fridayEmailEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="email-notif-content">
+                        <div class="email-notif-label">What's included:</div>
+                        <div class="email-notif-checklist">
+                            <label class="email-check-item">
+                                <input type="checkbox" id="fridayIncludeScore" checked>
+                                <span>📊 Current week progress score</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="fridayIncludeWeeklyTasks" checked>
+                                <span>⚡ Top 3 incomplete weekly tasks</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="fridayIncludePriorityTodos" checked>
+                                <span>🔥 Priority to-dos from homepage</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="fridayIncludeMonthlyTasks" checked>
+                                <span>📆 Suggested monthly tasks</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="fridayIncludeQuarterlyTasks" checked>
+                                <span>📊 Suggested quarterly tasks</span>
+                            </label>
                         </div>
                     </div>
-                    <select class="form-input form-select notification-setting-select" id="weeklyReminder">
-                        <option value="1">1 day left</option>
-                        <option value="2" selected>2 days left</option>
-                        <option value="3">3 days left</option>
-                        <option value="4">4 days left</option>
-                    </select>
-                </div>
-                
-                <div class="notification-setting-item">
-                    <div class="notification-setting-info">
-                        <div class="notification-setting-icon">🗓️</div>
-                        <div>
-                            <div class="notification-setting-title">Monthly Tasks</div>
-                            <div class="notification-setting-subtitle">Remind me when there are this many days left in the month</div>
-                        </div>
-                    </div>
-                    <select class="form-input form-select notification-setting-select" id="monthlyReminder">
-                        <option value="3">3 days left</option>
-                        <option value="5">5 days left</option>
-                        <option value="7" selected>7 days left</option>
-                        <option value="10">10 days left</option>
-                        <option value="14">14 days left</option>
-                    </select>
-                </div>
-                
-                <div class="notification-setting-item">
-                    <div class="notification-setting-info">
-                        <div class="notification-setting-icon">📊</div>
-                        <div>
-                            <div class="notification-setting-title">Quarterly Tasks</div>
-                            <div class="notification-setting-subtitle">Remind me when there are this many days left in the quarter</div>
-                        </div>
-                    </div>
-                    <select class="form-input form-select notification-setting-select" id="quarterlyReminder">
-                        <option value="7">7 days left</option>
-                        <option value="14" selected>14 days left</option>
-                        <option value="21">21 days left</option>
-                        <option value="30">30 days left</option>
-                    </select>
-                </div>
-                
-                <div class="notification-setting-item">
-                    <div class="notification-setting-info">
-                        <div class="notification-setting-icon">🎯</div>
-                        <div>
-                            <div class="notification-setting-title">Yearly Tasks</div>
-                            <div class="notification-setting-subtitle">Remind me when there are this many days left in the year</div>
-                        </div>
-                    </div>
-                    <select class="form-input form-select notification-setting-select" id="yearlyReminder">
-                        <option value="14">14 days left</option>
-                        <option value="30" selected>30 days left</option>
-                        <option value="60">60 days left</option>
-                        <option value="90">90 days left</option>
-                    </select>
-                </div>
-
-                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
-
-                <h4 style="margin-bottom: 1rem; font-size: 1rem;">📧 Email Notifications</h4>
-                
-                <div class="notification-setting-item">
-                    <div class="notification-setting-info">
-                        <div class="notification-setting-icon">✉️</div>
-                        <div>
-                            <div class="notification-setting-title">Email Addresses</div>
-                            <div class="notification-setting-subtitle">Where to send task reminders (one email per line)</div>
-                        </div>
-                    </div>
-                    <textarea class="form-input form-textarea" id="notificationEmail" placeholder="email1@example.com&#10;email2@example.com&#10;email3@example.com" rows="3" style="margin-top: 0.5rem;"></textarea>
-                </div>
-
-                <div class="notification-setting-item">
-                    <div class="notification-setting-info">
-                        <div class="notification-setting-icon">🕐</div>
-                        <div>
-                            <div class="notification-setting-title">Email Frequency</div>
-                            <div class="notification-setting-subtitle">How often to receive email reminders</div>
-                        </div>
-                    </div>
-                    <select class="form-input form-select notification-setting-select" id="emailFrequency">
-                        <option value="off">Off - No emails</option>
-                        <option value="daily">Daily digest</option>
-                        <option value="weekly">Weekly digest (Mondays)</option>
-                    </select>
-                </div>
-
-                <div class="email-test-section" id="emailTestSection" style="display: none;">
-                    <button class="btn btn-secondary" id="sendTestEmail" style="width: 100%; margin-top: 0.5rem;">
-                        📤 Send Test Email to All
+                    
+                    <button class="btn btn-secondary btn-sm email-test-btn" id="testFridayEmail">
+                        📤 Send Test Email
                     </button>
-                    <div class="email-status" id="emailStatus" style="margin-top: 0.5rem; font-size: 0.85rem; text-align: center;"></div>
+                </div>
+                
+                <!-- Monday Email Section -->
+                <div class="email-notif-card">
+                    <div class="email-notif-header">
+                        <div class="email-notif-title-row">
+                            <div class="email-notif-icon">📊</div>
+                            <div>
+                                <div class="email-notif-title">Monday Week Recap</div>
+                                <div class="email-notif-schedule">Every Monday at 10:00 AM CT</div>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="mondayEmailEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="email-notif-content">
+                        <div class="email-notif-label">What's included:</div>
+                        <div class="email-notif-checklist">
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeScore" checked>
+                                <span>📈 Previous week's score + comparison</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeShopify" checked>
+                                <span>🛒 Shopify sales & revenue</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeEmailSms" checked>
+                                <span>📧 Email + SMS list growth</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludePaidSubs" checked>
+                                <span>💎 Paid subscriber growth</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeRevenue" checked>
+                                <span>💰 Revenue breakdown</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeWeeklyTasks" checked>
+                                <span>⚡ Top 3 incomplete weekly tasks</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeMonthlyTasks" checked>
+                                <span>📆 Suggested monthly tasks</span>
+                            </label>
+                            <label class="email-check-item">
+                                <input type="checkbox" id="mondayIncludeQuarterlyTasks" checked>
+                                <span>📊 Suggested quarterly tasks</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary btn-sm email-test-btn" id="testMondayEmail">
+                        📤 Send Test Email
+                    </button>
+                </div>
+
+                <!-- Email Configuration -->
+                <div class="email-notif-card" style="background: var(--bg-tertiary);">
+                    <div class="email-notif-header" style="border-bottom: none; padding-bottom: 0;">
+                        <div class="email-notif-title-row">
+                            <div class="email-notif-icon">✉️</div>
+                            <div>
+                                <div class="email-notif-title">Email Address</div>
+                                <div class="email-notif-schedule">Where to send notifications</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="email-notif-content" style="padding-top: 0.75rem;">
+                        <textarea class="form-input form-textarea" id="notificationEmail" placeholder="your@email.com" rows="2" style="font-size: 0.9rem;"></textarea>
+                    </div>
                 </div>
 
                 <div class="email-setup-guide">
@@ -6964,11 +7128,14 @@
                     <ol>
                         <li>Go to <a href="https://www.emailjs.com/" target="_blank" style="color: var(--accent-primary);">emailjs.com</a> and create a free account</li>
                         <li>Add an email service (Gmail, Outlook, etc.)</li>
-                        <li>Create an email template with these variables:<br>
-                            <code>{{to_email}}</code> <code>{{subject}}</code> <code>{{task_list}}</code> <code>{{weekly_score}}</code></li>
+                        <li>Create an email template with variable: <code>{{message_html}}</code></li>
                         <li>Copy your Service ID, Template ID, and Public Key</li>
                         <li>Update the <code>EMAILJS_CONFIG</code> in the code</li>
                     </ol>
+                </div>
+
+                <div id="emailStatusContainer" style="margin-top: 1rem; text-align: center;">
+                    <div class="email-status" id="emailStatus" style="font-size: 0.85rem;"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -7146,13 +7313,31 @@
         let dailyHabitsCompletedToday = []; // Track which habits completed today
         let lastHabitResetDate = null; // Track when habits were last reset
         let notificationSettings = {
-            weekly: 2,      // Days before end of week
-            monthly: 7,     // Days before end of month
-            quarterly: 14,  // Days before end of quarter
-            yearly: 30,     // Days before end of year
             email: '',      // Email address for notifications
-            emailFrequency: 'off', // off, daily, weekly
-            lastEmailSent: null    // Track when last email was sent
+            // Friday email settings
+            fridayEnabled: true,
+            fridayIncludeScore: true,
+            fridayIncludeWeeklyTasks: true,
+            fridayIncludePriorityTodos: true,
+            fridayIncludeMonthlyTasks: true,
+            fridayIncludeQuarterlyTasks: true,
+            // Monday email settings
+            mondayEnabled: true,
+            mondayIncludeScore: true,
+            mondayIncludeShopify: true,
+            mondayIncludeEmailSms: true,
+            mondayIncludePaidSubs: true,
+            mondayIncludeRevenue: true,
+            mondayIncludeWeeklyTasks: true,
+            mondayIncludeMonthlyTasks: true,
+            mondayIncludeQuarterlyTasks: true,
+            // Legacy (keep for compatibility)
+            weekly: 2,
+            monthly: 7,
+            quarterly: 14,
+            yearly: 30,
+            emailFrequency: 'off',
+            lastEmailSent: null
         };
         
         // EmailJS Configuration
@@ -7198,9 +7383,6 @@
         const notificationTabs = document.querySelectorAll('.notification-tab');
         const notificationList = document.getElementById('notificationList');
         const notificationEmail = document.getElementById('notificationEmail');
-        const emailFrequency = document.getElementById('emailFrequency');
-        const emailTestSection = document.getElementById('emailTestSection');
-        const sendTestEmail = document.getElementById('sendTestEmail');
         const emailStatus = document.getElementById('emailStatus');
         const comingUpToggle = document.getElementById('comingUpToggle');
         const comingUpSection = document.getElementById('comingUpSection');
@@ -7400,9 +7582,12 @@
         });
 
         function getWeekStartDate(date = new Date()) {
+            // Week starts Monday at 12:00 AM
             const d = new Date(date);
             const day = d.getDay();
-            d.setDate(d.getDate() - day);
+            // If Sunday (0), go back 6 days. Otherwise go back (day - 1) days
+            const diff = day === 0 ? 6 : day - 1;
+            d.setDate(d.getDate() - diff);
             d.setHours(0, 0, 0, 0);
             return d;
         }
@@ -7410,7 +7595,7 @@
         function getWeekEndDate(date = new Date()) {
             const start = getWeekStartDate(date);
             const end = new Date(start);
-            end.setDate(end.getDate() + 6);
+            end.setDate(end.getDate() + 6); // Sunday
             end.setHours(23, 59, 59, 999);
             return end;
         }
@@ -8534,58 +8719,32 @@
             e.stopPropagation();
             notificationDropdown.classList.remove('open');
             
-            // Load current settings into form
-            document.getElementById('weeklyReminder').value = notificationSettings.weekly;
-            document.getElementById('monthlyReminder').value = notificationSettings.monthly;
-            document.getElementById('quarterlyReminder').value = notificationSettings.quarterly;
-            document.getElementById('yearlyReminder').value = notificationSettings.yearly;
+            // Load email address
             notificationEmail.value = notificationSettings.email || '';
-            emailFrequency.value = notificationSettings.emailFrequency || 'off';
             
-            // Show/hide test button based on email
-            updateEmailTestVisibility();
+            // Populate Friday email settings
+            document.getElementById('fridayEmailEnabled').checked = notificationSettings.fridayEnabled !== false;
+            document.getElementById('fridayIncludeScore').checked = notificationSettings.fridayIncludeScore !== false;
+            document.getElementById('fridayIncludeWeeklyTasks').checked = notificationSettings.fridayIncludeWeeklyTasks !== false;
+            document.getElementById('fridayIncludePriorityTodos').checked = notificationSettings.fridayIncludePriorityTodos !== false;
+            document.getElementById('fridayIncludeMonthlyTasks').checked = notificationSettings.fridayIncludeMonthlyTasks !== false;
+            document.getElementById('fridayIncludeQuarterlyTasks').checked = notificationSettings.fridayIncludeQuarterlyTasks !== false;
+            
+            // Populate Monday email settings
+            document.getElementById('mondayEmailEnabled').checked = notificationSettings.mondayEnabled !== false;
+            document.getElementById('mondayIncludeScore').checked = notificationSettings.mondayIncludeScore !== false;
+            document.getElementById('mondayIncludeShopify').checked = notificationSettings.mondayIncludeShopify !== false;
+            document.getElementById('mondayIncludeEmailSms').checked = notificationSettings.mondayIncludeEmailSms !== false;
+            document.getElementById('mondayIncludePaidSubs').checked = notificationSettings.mondayIncludePaidSubs !== false;
+            document.getElementById('mondayIncludeRevenue').checked = notificationSettings.mondayIncludeRevenue !== false;
+            document.getElementById('mondayIncludeWeeklyTasks').checked = notificationSettings.mondayIncludeWeeklyTasks !== false;
+            document.getElementById('mondayIncludeMonthlyTasks').checked = notificationSettings.mondayIncludeMonthlyTasks !== false;
+            document.getElementById('mondayIncludeQuarterlyTasks').checked = notificationSettings.mondayIncludeQuarterlyTasks !== false;
+            
+            // Clear status
+            document.getElementById('emailStatus').textContent = '';
             
             notificationSettingsModal.classList.add('open');
-        });
-
-        // Update test email visibility when email changes
-        notificationEmail.addEventListener('input', updateEmailTestVisibility);
-        emailFrequency.addEventListener('change', updateEmailTestVisibility);
-
-        function updateEmailTestVisibility() {
-            const hasEmail = notificationEmail.value.trim() !== '';
-            const isEnabled = emailFrequency.value !== 'off';
-            emailTestSection.style.display = (hasEmail && isEnabled) ? 'block' : 'none';
-            emailStatus.textContent = '';
-            emailStatus.className = 'email-status';
-        }
-
-        // Send test email
-        sendTestEmail.addEventListener('click', async () => {
-            const emails = parseEmails(notificationEmail.value);
-            if (emails.length === 0) {
-                emailStatus.textContent = '❌ Please enter at least one valid email address';
-                emailStatus.className = 'email-status error';
-                return;
-            }
-            
-            emailStatus.textContent = `📤 Sending test to ${emails.length} email${emails.length > 1 ? 's' : ''}...`;
-            emailStatus.className = 'email-status info';
-            
-            try {
-                const result = await sendEmailToAll(true);
-                if (result.failed === 0) {
-                    emailStatus.textContent = `✅ Test sent to ${result.successful} email${result.successful > 1 ? 's' : ''}! Check inbox.`;
-                    emailStatus.className = 'email-status success';
-                } else {
-                    emailStatus.textContent = `⚠️ Sent ${result.successful}/${result.total}. ${result.failed} failed.`;
-                    emailStatus.className = 'email-status error';
-                }
-            } catch (error) {
-                console.error('Email error:', error);
-                emailStatus.textContent = '❌ Failed to send. Check EmailJS setup.';
-                emailStatus.className = 'email-status error';
-            }
         });
 
         closeNotificationSettings.addEventListener('click', () => {
@@ -8599,19 +8758,83 @@
         });
 
         saveNotificationSettingsBtn.addEventListener('click', () => {
-            notificationSettings.weekly = parseInt(document.getElementById('weeklyReminder').value);
-            notificationSettings.monthly = parseInt(document.getElementById('monthlyReminder').value);
-            notificationSettings.quarterly = parseInt(document.getElementById('quarterlyReminder').value);
-            notificationSettings.yearly = parseInt(document.getElementById('yearlyReminder').value);
+            // Save Friday email settings
+            notificationSettings.fridayEnabled = document.getElementById('fridayEmailEnabled').checked;
+            notificationSettings.fridayIncludeScore = document.getElementById('fridayIncludeScore').checked;
+            notificationSettings.fridayIncludeWeeklyTasks = document.getElementById('fridayIncludeWeeklyTasks').checked;
+            notificationSettings.fridayIncludePriorityTodos = document.getElementById('fridayIncludePriorityTodos').checked;
+            notificationSettings.fridayIncludeMonthlyTasks = document.getElementById('fridayIncludeMonthlyTasks').checked;
+            notificationSettings.fridayIncludeQuarterlyTasks = document.getElementById('fridayIncludeQuarterlyTasks').checked;
+            
+            // Save Monday email settings
+            notificationSettings.mondayEnabled = document.getElementById('mondayEmailEnabled').checked;
+            notificationSettings.mondayIncludeScore = document.getElementById('mondayIncludeScore').checked;
+            notificationSettings.mondayIncludeShopify = document.getElementById('mondayIncludeShopify').checked;
+            notificationSettings.mondayIncludeEmailSms = document.getElementById('mondayIncludeEmailSms').checked;
+            notificationSettings.mondayIncludePaidSubs = document.getElementById('mondayIncludePaidSubs').checked;
+            notificationSettings.mondayIncludeRevenue = document.getElementById('mondayIncludeRevenue').checked;
+            notificationSettings.mondayIncludeWeeklyTasks = document.getElementById('mondayIncludeWeeklyTasks').checked;
+            notificationSettings.mondayIncludeMonthlyTasks = document.getElementById('mondayIncludeMonthlyTasks').checked;
+            notificationSettings.mondayIncludeQuarterlyTasks = document.getElementById('mondayIncludeQuarterlyTasks').checked;
+            
+            // Save email address
             notificationSettings.email = notificationEmail.value.trim();
-            notificationSettings.emailFrequency = emailFrequency.value;
             
             saveNotificationSettings();
             notificationSettingsModal.classList.remove('open');
-            updateNotifications();
             
-            // Check if we should send email now
-            checkAndSendScheduledEmail();
+            const emailStatus = document.getElementById('emailStatus');
+            emailStatus.textContent = '✅ Settings saved!';
+            emailStatus.className = 'email-status success';
+        });
+
+        // Test email button handlers
+        document.getElementById('testFridayEmail').addEventListener('click', async () => {
+            const emailStatus = document.getElementById('emailStatus');
+            const emails = parseEmails(notificationEmail.value.trim());
+            
+            if (emails.length === 0) {
+                emailStatus.textContent = '❌ Please enter an email address first';
+                emailStatus.className = 'email-status error';
+                return;
+            }
+            
+            emailStatus.textContent = '📤 Sending Friday test email...';
+            emailStatus.className = 'email-status';
+            
+            try {
+                await Promise.all(emails.map(email => sendFridayProgressEmail(email)));
+                emailStatus.textContent = '✅ Friday test email sent!';
+                emailStatus.className = 'email-status success';
+            } catch (error) {
+                console.error('Friday email error:', error);
+                emailStatus.textContent = '❌ Failed to send. Check EmailJS setup.';
+                emailStatus.className = 'email-status error';
+            }
+        });
+
+        document.getElementById('testMondayEmail').addEventListener('click', async () => {
+            const emailStatus = document.getElementById('emailStatus');
+            const emails = parseEmails(notificationEmail.value.trim());
+            
+            if (emails.length === 0) {
+                emailStatus.textContent = '❌ Please enter an email address first';
+                emailStatus.className = 'email-status error';
+                return;
+            }
+            
+            emailStatus.textContent = '📤 Sending Monday test email...';
+            emailStatus.className = 'email-status';
+            
+            try {
+                await Promise.all(emails.map(email => sendMondayRecapEmail(email)));
+                emailStatus.textContent = '✅ Monday test email sent!';
+                emailStatus.className = 'email-status success';
+            } catch (error) {
+                console.error('Monday email error:', error);
+                emailStatus.textContent = '❌ Failed to send. Check EmailJS setup.';
+                emailStatus.className = 'email-status error';
+            }
         });
 
         // Helper to parse multiple emails from textarea
@@ -8623,16 +8846,533 @@
                 .filter(e => e && e.includes('@'));  // Basic validation
         }
 
+        // ========== MONDAY-BASED WEEK HELPER ==========
+        // Week starts Monday at 12:00 AM (so Sunday 11:59 PM is end of previous week)
+        function getWeekStartMonday(date = new Date()) {
+            const d = new Date(date);
+            const day = d.getDay();
+            // If Sunday (0), go back 6 days. Otherwise go back (day - 1) days
+            const diff = day === 0 ? 6 : day - 1;
+            d.setDate(d.getDate() - diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function getLastWeekStartMonday() {
+            const thisWeekStart = getWeekStartMonday();
+            const lastWeekStart = new Date(thisWeekStart);
+            lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+            return lastWeekStart;
+        }
+
+        function getLastWeekEndMonday() {
+            const thisWeekStart = getWeekStartMonday();
+            const lastWeekEnd = new Date(thisWeekStart);
+            lastWeekEnd.setMilliseconds(-1); // Sunday 11:59:59.999 PM
+            return lastWeekEnd;
+        }
+
+        // ========== NEW EMAIL DESIGN - MAILING LIST STYLE ==========
+        function getEmailBaseTemplate(content, subject) {
+            return `
+                <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000000;">
+                    <!-- Header with Image -->
+                    <div style="background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%), url('https://i.imgur.com/placeholder.jpg'); background-size: cover; background-position: center; padding: 40px 24px; text-align: center;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 8px; text-transform: uppercase;">SLOE JACK</h1>
+                        <p style="color: #d4af37; margin: 16px 0 0 0; font-size: 14px; letter-spacing: 4px; text-transform: uppercase;">Content Planner</p>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div style="background: #0a0a0a; padding: 32px 24px;">
+                        ${content}
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="background: #000000; padding: 24px; text-align: center; border-top: 1px solid #222;">
+                        <p style="color: #666; margin: 0; font-size: 12px;">
+                            Stop making excuses. Start making content.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Friday 5PM Email - Week Progress & What's Left
+        async function sendFridayProgressEmail(toEmail) {
+            const weekStart = getWeekStartMonday();
+            const weekCompletions = getCompletionsForWeek(weekStart);
+            const scoreData = calculateWeeklyScore(weekCompletions);
+            
+            // Get incomplete weekly tasks (top 3 priority)
+            const incompleteTasks = tasks
+                .filter(t => t.frequency === 'weekly' && !isCompletedThisWeek(t))
+                .slice(0, 3);
+            
+            // Get priority to-dos from homepage
+            const priorityTodos = (window.todoData?.todos || [])
+                .filter(t => !t.completed && t.priority)
+                .slice(0, 3);
+            
+            // Get monthly tasks suggestions
+            const monthlyTasks = tasks
+                .filter(t => t.frequency === 'monthly' && !isCompletedThisMonth(t))
+                .slice(0, 3);
+            
+            // Get quarterly tasks suggestions
+            const quarterlyTasks = tasks
+                .filter(t => t.frequency === 'quarterly')
+                .slice(0, 3);
+            
+            // Build task lists based on settings
+            let incompleteHtml = '';
+            if (notificationSettings.fridayIncludeWeeklyTasks !== false) {
+                incompleteHtml = incompleteTasks.length > 0 ? incompleteTasks.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #d4af37; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: #d4af37; font-size: 12px; margin-left: 8px;">WEEKLY</span>
+                    </div>
+                `).join('') : '<p style="color: #666;">Nothing left. Either you crushed it or you\'re lying to yourself.</p>';
+            }
+            
+            let todoHtml = '';
+            if (notificationSettings.fridayIncludePriorityTodos !== false) {
+                todoHtml = priorityTodos.length > 0 ? priorityTodos.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #ef4444; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                    </div>
+                `).join('') : '<p style="color: #666;">No priority to-dos. Suspiciously empty...</p>';
+            }
+            
+            let monthlyHtml = '';
+            if (notificationSettings.fridayIncludeMonthlyTasks !== false && monthlyTasks.length > 0) {
+                monthlyHtml = monthlyTasks.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #8b5cf6; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: #8b5cf6; font-size: 12px; margin-left: 8px;">MONTHLY</span>
+                    </div>
+                `).join('');
+            }
+            
+            let quarterlyHtml = '';
+            if (notificationSettings.fridayIncludeQuarterlyTasks !== false && quarterlyTasks.length > 0) {
+                quarterlyHtml = quarterlyTasks.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #f97316; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: #f97316; font-size: 12px; margin-left: 8px;">QUARTERLY</span>
+                    </div>
+                `).join('');
+            }
+            
+            // Sarcastic message based on score
+            let sarcasticMessage = '';
+            if (scoreData.score >= 9) {
+                sarcasticMessage = "You're actually doing well. Don't let it go to your head.";
+            } else if (scoreData.score >= 7) {
+                sarcasticMessage = "Decent progress. But 'decent' doesn't build empires.";
+            } else if (scoreData.score >= 5) {
+                sarcasticMessage = "Mediocre at best. Your subscribers deserve better. So do you.";
+            } else {
+                sarcasticMessage = "This is embarrassing. You've got 2 days to not be a disappointment.";
+            }
+            
+            // Build content based on settings
+            let content = `
+                <p style="color: #ffffff; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                    ${sarcasticMessage}
+                </p>
+            `;
+            
+            // Score card
+            if (notificationSettings.fridayIncludeScore !== false) {
+                content += `
+                    <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 1px solid #d4af37; padding: 24px; text-align: center; margin-bottom: 32px;">
+                        <p style="color: #d4af37; margin: 0 0 8px 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Weekly Score</p>
+                        <div style="font-size: 56px; font-weight: 700; color: #ffffff;">${scoreData.score.toFixed(1)}</div>
+                        <p style="color: #666; margin: 8px 0 0 0; font-size: 14px;">out of 10</p>
+                    </div>
+                `;
+            }
+            
+            // Incomplete weekly tasks
+            if (incompleteHtml) {
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            ⚠️ WEEKLY TASKS NOT DONE
+                        </h2>
+                        ${incompleteHtml}
+                    </div>
+                `;
+            }
+            
+            // Priority to-dos
+            if (todoHtml) {
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            🔥 PRIORITY TO-DOS
+                        </h2>
+                        ${todoHtml}
+                    </div>
+                `;
+            }
+            
+            // Monthly suggestions
+            if (monthlyHtml) {
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            📅 MONTHLY TASKS TO TACKLE
+                        </h2>
+                        <p style="color: #888; font-size: 14px; margin: 0 0 16px 0;">Got extra time? Probably not, but here's what you could tackle:</p>
+                        ${monthlyHtml}
+                    </div>
+                `;
+            }
+            
+            // Quarterly suggestions
+            if (quarterlyHtml) {
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            📊 QUARTERLY TASKS
+                        </h2>
+                        <p style="color: #888; font-size: 14px; margin: 0 0 16px 0;">Big picture stuff. Don't forget these exist:</p>
+                        ${quarterlyHtml}
+                    </div>
+                `;
+            }
+            
+            content += `
+                <p style="color: #666; font-size: 14px; margin: 32px 0 0 0; text-align: center;">
+                    Weekend's here. Don't waste it. 🎯
+                </p>
+            `;
+            
+            const emailHtml = getEmailBaseTemplate(content);
+            
+            const templateParams = {
+                to_email: toEmail,
+                to_name: 'Creator',
+                subject: scoreData.score >= 7 ? "📊 Friday Check: You're Not Completely Failing" : "⚠️ Friday Reality Check: We Need to Talk",
+                message_html: emailHtml
+            };
+            
+            return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams, EMAILJS_CONFIG.publicKey);
+        }
+
+        // Monday 10AM Email - Weekly Recap
+        async function sendMondayRecapEmail(toEmail) {
+            const lastWeekStart = getLastWeekStartMonday();
+            const lastWeekEnd = getLastWeekEndMonday();
+            const thisWeekStart = getWeekStartMonday();
+            
+            // Get last week's completions and score
+            const lastWeekCompletions = getCompletionsForWeek(lastWeekStart);
+            const lastWeekScore = calculateWeeklyScore(lastWeekCompletions);
+            
+            // Get week before for comparison
+            const weekBeforeStart = new Date(lastWeekStart);
+            weekBeforeStart.setDate(weekBeforeStart.getDate() - 7);
+            const weekBeforeCompletions = getCompletionsForWeek(weekBeforeStart);
+            const weekBeforeScore = calculateWeeklyScore(weekBeforeCompletions);
+            
+            const scoreDiff = lastWeekScore.score - weekBeforeScore.score;
+            const scoreChange = scoreDiff > 0 ? `+${scoreDiff.toFixed(1)}` : scoreDiff.toFixed(1);
+            
+            // Get Shopify data for last week
+            const shopifyWeekRevenue = shopifyData.weekRevenue || 0;
+            const shopifyWeekOrders = shopifyData.weekOrders || 0;
+            
+            // Get subscriber stats
+            const emailSmsTotal = analyticsData.currentCount || 0;
+            const paidSubsTotal = getTotalPaidSubscribers();
+            const paidSubsWeeklyGrowth = document.getElementById('paidWeeklyGrowth')?.textContent || '+0';
+            const emailWeeklyGrowth = document.getElementById('weeklyGrowth')?.textContent || '+0';
+            
+            // Get incomplete weekly tasks (top 3)
+            const incompleteTasks = tasks
+                .filter(t => t.frequency === 'weekly' && !isCompletedThisWeek(t))
+                .slice(0, 3);
+            
+            // Get monthly tasks suggestions
+            const monthlyTasks = tasks
+                .filter(t => t.frequency === 'monthly' && !isCompletedThisMonth(t))
+                .slice(0, 3);
+            
+            // Get quarterly tasks suggestions
+            const quarterlyTasks = tasks
+                .filter(t => t.frequency === 'quarterly')
+                .slice(0, 3);
+            
+            // Sarcastic verdict
+            let verdict = '';
+            if (lastWeekScore.score >= 9) {
+                verdict = "Last week? Actually impressive. Don't get comfortable.";
+            } else if (lastWeekScore.score >= 7) {
+                verdict = "Not bad. Not great. Just... not bad.";
+            } else if (lastWeekScore.score >= 5) {
+                verdict = "Last week was mid. Let's not repeat that disaster.";
+            } else {
+                verdict = "Last week was a trainwreck. New week, new you? Probably not, but try anyway.";
+            }
+            
+            // Comparison message
+            let comparisonMsg = '';
+            if (scoreDiff > 1) {
+                comparisonMsg = `Up ${scoreChange} from the week before. Progress exists.`;
+            } else if (scoreDiff > 0) {
+                comparisonMsg = `Slightly better than before (${scoreChange}). Baby steps.`;
+            } else if (scoreDiff === 0) {
+                comparisonMsg = "Same as before. Consistency or stagnation? You decide.";
+            } else {
+                comparisonMsg = `Down ${scoreChange} from the week before. That's going backwards, genius.`;
+            }
+            
+            // Build content based on settings
+            let content = `
+                <p style="color: #ffffff; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                    ${verdict}
+                </p>
+            `;
+            
+            // Score card
+            if (notificationSettings.mondayIncludeScore !== false) {
+                content += `
+                    <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 1px solid #d4af37; padding: 24px; text-align: center; margin-bottom: 16px;">
+                        <p style="color: #d4af37; margin: 0 0 8px 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Last Week's Score</p>
+                        <div style="font-size: 56px; font-weight: 700; color: #ffffff;">${lastWeekScore.score.toFixed(1)}</div>
+                        <p style="color: ${scoreDiff >= 0 ? '#22c55e' : '#ef4444'}; margin: 8px 0 0 0; font-size: 14px;">${comparisonMsg}</p>
+                    </div>
+                `;
+            }
+            
+            // Stats Grid
+            let showStats = notificationSettings.mondayIncludeShopify !== false || 
+                           notificationSettings.mondayIncludeEmailSms !== false ||
+                           notificationSettings.mondayIncludePaidSubs !== false ||
+                           notificationSettings.mondayIncludeRevenue !== false;
+            
+            if (showStats) {
+                content += `
+                    <div style="margin: 32px 0;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            📊 LAST WEEK BY THE NUMBERS
+                        </h2>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                `;
+                
+                if (notificationSettings.mondayIncludeShopify !== false) {
+                    content += `
+                        <div style="background: #1a1a1a; padding: 16px; text-align: center;">
+                            <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0;">🛒 Shopify Sales</p>
+                            <p style="color: #22c55e; font-size: 24px; font-weight: 700; margin: 0;">\$${shopifyWeekRevenue.toFixed(0)}</p>
+                            <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">${shopifyWeekOrders} orders</p>
+                        </div>
+                    `;
+                }
+                
+                if (notificationSettings.mondayIncludeEmailSms !== false) {
+                    content += `
+                        <div style="background: #1a1a1a; padding: 16px; text-align: center;">
+                            <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0;">📧 Email + SMS</p>
+                            <p style="color: #f97316; font-size: 24px; font-weight: 700; margin: 0;">${emailWeeklyGrowth}</p>
+                            <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">Total: ${emailSmsTotal.toLocaleString()}</p>
+                        </div>
+                    `;
+                }
+                
+                if (notificationSettings.mondayIncludePaidSubs !== false) {
+                    content += `
+                        <div style="background: #1a1a1a; padding: 16px; text-align: center;">
+                            <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0;">💎 Paid Subs</p>
+                            <p style="color: #8b5cf6; font-size: 24px; font-weight: 700; margin: 0;">${paidSubsWeeklyGrowth}</p>
+                            <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">Total: ${paidSubsTotal}</p>
+                        </div>
+                    `;
+                }
+                
+                if (notificationSettings.mondayIncludeRevenue !== false) {
+                    content += `
+                        <div style="background: #1a1a1a; padding: 16px; text-align: center;">
+                            <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0;">💰 Sub Revenue</p>
+                            <p style="color: #22c55e; font-size: 24px; font-weight: 700; margin: 0;">\$${getMonthlyRevenue().toFixed(0)}</p>
+                            <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">monthly recurring</p>
+                        </div>
+                    `;
+                }
+                
+                content += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Incomplete weekly tasks
+            if (notificationSettings.mondayIncludeWeeklyTasks !== false && incompleteTasks.length > 0) {
+                const weeklyHtml = incompleteTasks.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #3b82f6; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: #3b82f6; font-size: 12px; margin-left: 8px;">WEEKLY</span>
+                    </div>
+                `).join('');
+                
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            ⚡ THIS WEEK'S PRIORITIES
+                        </h2>
+                        ${weeklyHtml}
+                    </div>
+                `;
+            }
+            
+            // Monthly suggestions
+            if (notificationSettings.mondayIncludeMonthlyTasks !== false && monthlyTasks.length > 0) {
+                const monthlyHtml = monthlyTasks.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #8b5cf6; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: #8b5cf6; font-size: 12px; margin-left: 8px;">MONTHLY</span>
+                    </div>
+                `).join('');
+                
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            📅 MONTHLY TASKS TO TACKLE
+                        </h2>
+                        ${monthlyHtml}
+                    </div>
+                `;
+            }
+            
+            // Quarterly suggestions
+            if (notificationSettings.mondayIncludeQuarterlyTasks !== false && quarterlyTasks.length > 0) {
+                const quarterlyHtml = quarterlyTasks.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid #f97316; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: #f97316; font-size: 12px; margin-left: 8px;">QUARTERLY</span>
+                    </div>
+                `).join('');
+                
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            📊 QUARTERLY TASKS
+                        </h2>
+                        ${quarterlyHtml}
+                    </div>
+                `;
+            }
+            
+            content += `
+                <p style="color: #ffffff; font-size: 16px; margin: 32px 0 0 0; text-align: center;">
+                    New week. No excuses. Get to work. 💪
+                </p>
+            `;
+            
+            const emailHtml = getEmailBaseTemplate(content);
+            
+            const templateParams = {
+                to_email: toEmail,
+                to_name: 'Creator',
+                subject: lastWeekScore.score >= 7 ? "📈 Week Recap: You Didn't Completely Suck" : "📉 Week Recap: Let's Talk About What Went Wrong",
+                message_html: emailHtml
+            };
+            
+            return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams, EMAILJS_CONFIG.publicKey);
+        }
+
+        // Check and send scheduled weekly emails
+        function checkAndSendWeeklyEmails() {
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            const hour = now.getHours();
+            
+            const emails = parseEmails(notificationSettings.email);
+            if (emails.length === 0) return;
+            
+            const lastFridayEmail = localStorage.getItem('lastFridayEmail');
+            const lastMondayEmail = localStorage.getItem('lastMondayEmail');
+            const today = now.toDateString();
+            
+            // Friday 5PM CT - only if enabled
+            if (notificationSettings.fridayEnabled !== false && dayOfWeek === 5 && hour >= 17 && lastFridayEmail !== today) {
+                console.log('Sending Friday progress email...');
+                emails.forEach(email => sendFridayProgressEmail(email));
+                localStorage.setItem('lastFridayEmail', today);
+            }
+            
+            // Monday 10AM CT - only if enabled
+            if (notificationSettings.mondayEnabled !== false && dayOfWeek === 1 && hour >= 10 && lastMondayEmail !== today) {
+                console.log('Sending Monday recap email...');
+                emails.forEach(email => sendMondayRecapEmail(email));
+                localStorage.setItem('lastMondayEmail', today);
+            }
+        }
+
+        // Manual email trigger functions (call from console)
+        window.sendMondayRecap = function() {
+            const emails = parseEmails(notificationSettings.email);
+            if (emails.length === 0) {
+                console.error('No email configured');
+                return;
+            }
+            console.log('Sending Monday recap to:', emails);
+            emails.forEach(email => sendMondayRecapEmail(email)
+                .then(() => console.log('✅ Monday recap sent to', email))
+                .catch(e => console.error('❌ Failed to send to', email, e))
+            );
+        };
+
+        window.sendFridayProgress = function() {
+            const emails = parseEmails(notificationSettings.email);
+            if (emails.length === 0) {
+                console.error('No email configured');
+                return;
+            }
+            console.log('Sending Friday progress to:', emails);
+            emails.forEach(email => sendFridayProgressEmail(email)
+                .then(() => console.log('✅ Friday progress sent to', email))
+                .catch(e => console.error('❌ Failed to send to', email, e))
+            );
+        };
+
+        // Helper to check if task is completed this week (Monday-based)
+        function isCompletedThisWeek(task) {
+            const weekStart = getWeekStartMonday();
+            return task.completions?.some(c => new Date(c) >= weekStart);
+        }
+
+        // Helper to check if task is completed this month
+        function isCompletedThisMonth(task) {
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            return task.completions?.some(c => new Date(c) >= monthStart);
+        }
+
         // Email notification functions
         async function sendEmailNotification(toEmail, isTest = false) {
             const dueTasks = getDueTasks();
             
             // Get weekly score
-            const thisWeekStart = getWeekStartDate();
+            const thisWeekStart = getWeekStartMonday();
             const thisWeekCompletions = getCompletionsForWeek(thisWeekStart);
             const scoreData = calculateWeeklyScore(thisWeekCompletions);
             
-            // Build HTML task list for email
+            // Sarcastic message based on score and task count
+            let sarcasticMessage = '';
+            if (isTest) {
+                sarcasticMessage = "Test email. Making sure this thing actually works.";
+            } else if (dueTasks.length === 0) {
+                sarcasticMessage = "Nothing due right now. Suspicious. Are you hiding something?";
+            } else if (dueTasks.length > 5) {
+                sarcasticMessage = `${dueTasks.length} tasks waiting. They're not going to complete themselves.`;
+            } else {
+                sarcasticMessage = "Here's what needs your attention. Don't make excuses.";
+            }
+            
+            // Build task list HTML
             let taskListHtml = '';
             if (dueTasks.length > 0) {
                 taskListHtml = dueTasks.map(task => {
@@ -8645,85 +9385,61 @@
                     };
                     const color = freqColors[task.frequency] || '#6b7280';
                     return `
-                        <tr>
-                            <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
-                                <div style="font-weight: 500; color: #1f2937; margin-bottom: 4px;">${task.title}</div>
-                                <div>
-                                    <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: ${color}; color: white; text-transform: uppercase;">${task.frequency}</span>
-                                    <span style="color: #6b7280; font-size: 12px; margin-left: 8px;">${task.timeText}</span>
-                                </div>
-                            </td>
-                        </tr>
+                        <div style="background: #1a1a1a; border-left: 3px solid ${color}; padding: 12px 16px; margin-bottom: 8px;">
+                            <span style="color: #ffffff; font-weight: 500;">${task.title}</span>
+                            <span style="color: ${color}; font-size: 12px; margin-left: 8px; text-transform: uppercase;">${task.frequency}</span>
+                            <span style="color: #666; font-size: 12px; margin-left: 8px;">${task.timeText}</span>
+                        </div>
                     `;
                 }).join('');
             } else {
-                taskListHtml = `
-                    <tr>
-                        <td style="padding: 24px; text-align: center; color: #6b7280;">
-                            ✨ No tasks due right now. Great job staying on top of things!
-                        </td>
-                    </tr>
-                `;
+                taskListHtml = `<p style="color: #666; text-align: center; padding: 24px;">All clear. For now.</p>`;
             }
             
-            // Build full HTML email
-            const emailHtml = `
-                <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                    <!-- Header -->
-                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px; border-radius: 16px 16px 0 0; text-align: center;">
-                        <div style="display: inline-block; background: linear-gradient(135deg, #f97316, #ea580c); padding: 12px 20px; border-radius: 12px; margin-bottom: 16px;">
-                            <span style="color: white; font-weight: 700; font-size: 18px;">SJ</span>
-                        </div>
-                        <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 700;">SLOE JACK</h1>
-                        <p style="color: #9ca3af; margin: 4px 0 0 0; font-size: 14px;">Subscriber Content Planner</p>
-                    </div>
-                    
-                    <!-- Score Card -->
-                    <div style="background: linear-gradient(135deg, #f97316, #ea580c); padding: 24px; text-align: center;">
-                        <p style="color: rgba(255,255,255,0.8); margin: 0 0 8px 0; font-size: 14px;">Weekly Progress</p>
-                        <div style="font-size: 48px; font-weight: 700; color: white;">${scoreData.score.toFixed(1)}</div>
-                        <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0 0; font-size: 14px;">out of 10</p>
-                    </div>
-                    
-                    <!-- Message -->
-                    <div style="background: #f9fafb; padding: 20px 24px; border-left: 4px solid #f97316;">
-                        <p style="margin: 0; color: #374151; font-size: 15px;">
-                            ${isTest ? '🧪 This is a test email from your SLOE JACK planner.' : '👋 Hey Creator! Here\'s your task update:'}
-                        </p>
-                    </div>
-                    
-                    <!-- Tasks -->
-                    <div style="background: white; padding: 0;">
-                        <div style="padding: 16px 24px; border-bottom: 2px solid #f3f4f6;">
-                            <h2 style="margin: 0; font-size: 16px; color: #1f2937;">📋 ${dueTasks.length > 0 ? `Tasks Due (${dueTasks.length})` : 'All Caught Up!'}</h2>
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            ${taskListHtml}
-                        </table>
-                    </div>
-                    
-                    <!-- Footer -->
-                    <div style="background: #1f2937; padding: 24px; border-radius: 0 0 16px 16px; text-align: center;">
-                        <p style="color: #9ca3af; margin: 0; font-size: 13px;">
-                            📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-                        </p>
-                        <p style="color: #6b7280; margin: 12px 0 0 0; font-size: 12px;">
-                            Keep creating amazing content for your subscribers! 🚀
-                        </p>
-                    </div>
+            const content = `
+                <p style="color: #ffffff; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                    ${sarcasticMessage}
+                </p>
+                
+                <!-- Score Card -->
+                <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 1px solid #d4af37; padding: 24px; text-align: center; margin-bottom: 32px;">
+                    <p style="color: #d4af37; margin: 0 0 8px 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Weekly Score</p>
+                    <div style="font-size: 56px; font-weight: 700; color: #ffffff;">${scoreData.score.toFixed(1)}</div>
+                    <p style="color: #666; margin: 8px 0 0 0; font-size: 14px;">out of 10</p>
                 </div>
+                
+                <!-- Tasks -->
+                <div style="margin-bottom: 24px;">
+                    <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                        ${dueTasks.length > 0 ? `⚡ TASKS DUE (${dueTasks.length})` : '✓ ALL CAUGHT UP'}
+                    </h2>
+                    ${taskListHtml}
+                </div>
+                
+                <p style="color: #666; font-size: 14px; margin: 32px 0 0 0; text-align: center;">
+                    ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                </p>
             `;
+            
+            const emailHtml = getEmailBaseTemplate(content);
+            
+            // Sarcastic subject line
+            let subject = '';
+            if (isTest) {
+                subject = "🧪 Test Email: Making Sure You're Paying Attention";
+            } else if (dueTasks.length === 0) {
+                subject = "✅ You're Clear. Don't Get Lazy.";
+            } else if (dueTasks.length > 5) {
+                subject = `🚨 ${dueTasks.length} Tasks Piling Up. Handle It.`;
+            } else {
+                subject = "📋 Task Reminder: No Excuses";
+            }
             
             const templateParams = {
                 to_email: toEmail,
                 to_name: 'Creator',
-                subject: isTest ? '🧪 Test: SLOE JACK Task Reminder' : '🔔 SLOE JACK Task Reminder',
-                message_html: emailHtml,
-                message_type: isTest ? 'This is a test email from your SLOE JACK Subscriber Content Planner.' : 'Here are your upcoming tasks:',
-                task_list: dueTasks.map(t => `• ${t.title} (${t.frequency})`).join('\n'),
-                task_count: dueTasks.length,
-                weekly_score: scoreData.score.toFixed(1),
-                date: new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                subject: subject,
+                message_html: emailHtml
             };
             
             // Check if EmailJS is configured
@@ -10451,21 +11167,16 @@
                 
                 switch(filter) {
                     case 'week':
-                        // This week (Sunday to Saturday)
-                        const startOfWeek = new Date(now);
-                        startOfWeek.setDate(now.getDate() - now.getDay());
-                        startOfWeek.setHours(0, 0, 0, 0);
+                        // This week (Monday to Sunday)
+                        const startOfWeek = getWeekStartDate(now);
                         return completedDate >= startOfWeek;
                     
                     case 'lastweek':
-                        // Last week
-                        const lastWeekStart = new Date(now);
-                        lastWeekStart.setDate(now.getDate() - now.getDay() - 7);
-                        lastWeekStart.setHours(0, 0, 0, 0);
-                        const lastWeekEnd = new Date(now);
-                        lastWeekEnd.setDate(now.getDate() - now.getDay());
-                        lastWeekEnd.setHours(0, 0, 0, 0);
-                        return completedDate >= lastWeekStart && completedDate < lastWeekEnd;
+                        // Last week (Monday to Sunday)
+                        const thisWeekStart = getWeekStartDate(now);
+                        const lastWeekStart = new Date(thisWeekStart);
+                        lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+                        return completedDate >= lastWeekStart && completedDate < thisWeekStart;
                     
                     case 'month':
                         // This month
@@ -10869,9 +11580,7 @@
 
                 // Calculate stats
                 const now = new Date();
-                const startOfWeek = new Date(now);
-                startOfWeek.setDate(now.getDate() - now.getDay());
-                startOfWeek.setHours(0, 0, 0, 0);
+                const startOfWeek = getWeekStartDate(now); // Monday-based week
 
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                 
@@ -11138,11 +11847,9 @@
 
             if (currentEl) currentEl.textContent = analyticsData.currentCount.toLocaleString();
 
-            // Calculate weekly growth (resets Sunday at midnight)
+            // Calculate weekly growth (resets Monday at midnight)
             const now = new Date();
-            const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - now.getDay()); // Go back to Sunday
-            startOfWeek.setHours(0, 0, 0, 0);
+            const startOfWeek = getWeekStartDate(now); // Monday-based week
             
             // Get the fan count at the start of this week
             // Find the most recent history entry BEFORE this week started
@@ -11190,11 +11897,9 @@
             if (totalEl) totalEl.textContent = totalSubs.toLocaleString();
             if (revenueEl) revenueEl.textContent = '$' + revenue.toFixed(0);
             
-            // Calculate weekly growth for paid subscribers
+            // Calculate weekly growth for paid subscribers (Monday-based week)
             const now = new Date();
-            const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - now.getDay());
-            startOfWeek.setHours(0, 0, 0, 0);
+            const startOfWeek = getWeekStartDate(now);
             
             const historyBeforeWeek = paidSubscriberData.history
                 .filter(h => new Date(h.date) < startOfWeek)
@@ -11233,11 +11938,9 @@
             const current = analyticsData.currentCount;
             const now = new Date();
             
-            // Get count at start of this week (Sunday midnight)
+            // Get count at start of this week (Monday midnight)
             function getWeekStartCount() {
-                const weekStart = new Date(now);
-                weekStart.setDate(now.getDate() - now.getDay());
-                weekStart.setHours(0, 0, 0, 0);
+                const weekStart = getWeekStartDate(now);
                 
                 // Find the last history entry before this week started
                 const historyBeforeWeek = analyticsData.history
@@ -11306,11 +12009,9 @@
             const currentRevenue = getMonthlyRevenue();
             const now = new Date();
             
-            // Get count at start of this week (Sunday midnight)
+            // Get count at start of this week (Monday midnight)
             function getWeekStartCount() {
-                const weekStart = new Date(now);
-                weekStart.setDate(now.getDate() - now.getDay());
-                weekStart.setHours(0, 0, 0, 0);
+                const weekStart = getWeekStartDate(now);
                 
                 const historyBeforeWeek = paidSubscriberData.history
                     .filter(h => new Date(h.date) < weekStart)
@@ -12242,6 +12943,9 @@
             
             // Check if we need to send scheduled email
             checkAndSendScheduledEmail();
+            
+            // Check for Friday/Monday weekly emails
+            checkAndSendWeeklyEmails();
             
             // Listen for real-time updates from Firebase
             listenForUpdates();
