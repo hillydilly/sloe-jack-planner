@@ -6083,16 +6083,18 @@
                         <div class="notification-header">
                             <span>🔔 Notifications</span>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                <button class="notification-settings-btn" id="notificationSettingsBtn" title="Settings">⚙️</button>
                                 <button class="notification-close-mobile" id="notificationCloseMobile" title="Close">✕</button>
                             </div>
                         </div>
-                        <div class="notification-tabs">
-                            <button class="notification-tab active" data-tab="due">Due Now</button>
-                            <button class="notification-tab" data-tab="upcoming">Coming Up</button>
-                        </div>
-                        <div class="notification-list" id="notificationList">
-                            <!-- Populated by JS -->
+                        <div style="padding: 1.5rem; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 0.75rem;">📧</div>
+                            <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem;">Email Notifications</h4>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1rem 0;">
+                                Get weekly progress emails every Friday & Monday
+                            </p>
+                            <button class="btn btn-primary btn-sm" id="notificationSettingsBtn" style="width: 100%;">
+                                ⚙️ Configure Emails
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -8904,23 +8906,23 @@
             const scoreData = calculateWeeklyScore(weekCompletions);
             
             // Get incomplete weekly tasks (top 3 priority)
-            const incompleteTasks = tasks
-                .filter(t => t.frequency === 'weekly' && !isCompletedThisWeek(t))
+            const incompleteTasks = (tasks.weekly || [])
+                .filter(t => !isCompletedThisWeek(t))
                 .slice(0, 3);
             
-            // Get priority to-dos from homepage
-            const priorityTodos = (window.todoData?.todos || [])
-                .filter(t => !t.completed && t.priority)
+            // Get priority to-dos from homepage (P1, P2, P3 items)
+            const priorityTodos = (todoData.items || [])
+                .filter(item => !item.completed && item.priority && item.priority <= 3)
+                .sort((a, b) => (a.priority || 4) - (b.priority || 4))
                 .slice(0, 3);
             
             // Get monthly tasks suggestions
-            const monthlyTasks = tasks
-                .filter(t => t.frequency === 'monthly' && !isCompletedThisMonth(t))
+            const monthlyTasks = (tasks.monthly || [])
+                .filter(t => !isCompletedThisMonth(t))
                 .slice(0, 3);
             
             // Get quarterly tasks suggestions
-            const quarterlyTasks = tasks
-                .filter(t => t.frequency === 'quarterly')
+            const quarterlyTasks = (tasks.quarterly || [])
                 .slice(0, 3);
             
             // Build task lists based on settings
@@ -8936,9 +8938,12 @@
             
             let todoHtml = '';
             if (notificationSettings.fridayIncludePriorityTodos !== false) {
+                const priorityColors = { 1: '#ef4444', 2: '#f97316', 3: '#3b82f6' };
+                const priorityLabels = { 1: 'P1', 2: 'P2', 3: 'P3' };
                 todoHtml = priorityTodos.length > 0 ? priorityTodos.map(t => `
-                    <div style="background: #1a1a1a; border-left: 3px solid #ef4444; padding: 12px 16px; margin-bottom: 8px;">
+                    <div style="background: #1a1a1a; border-left: 3px solid ${priorityColors[t.priority] || '#ef4444'}; padding: 12px 16px; margin-bottom: 8px;">
                         <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: ${priorityColors[t.priority] || '#ef4444'}; font-size: 12px; margin-left: 8px;">${priorityLabels[t.priority] || 'P1'}</span>
                     </div>
                 `).join('') : '<p style="color: #666;">No priority to-dos. Suspiciously empty...</p>';
             }
@@ -9080,29 +9085,80 @@
             const scoreDiff = lastWeekScore.score - weekBeforeScore.score;
             const scoreChange = scoreDiff > 0 ? `+${scoreDiff.toFixed(1)}` : scoreDiff.toFixed(1);
             
-            // Get Shopify data for last week
-            const shopifyWeekRevenue = shopifyData.weekRevenue || 0;
-            const shopifyWeekOrders = shopifyData.weekOrders || 0;
+            // Calculate LAST WEEK's Shopify sales from stored orders
+            // shopifyData.recentOrders contains orders fetched from API
+            let lastWeekShopifyRevenue = 0;
+            let lastWeekShopifyOrders = 0;
+            if (shopifyData.recentOrders && shopifyData.recentOrders.length > 0) {
+                shopifyData.recentOrders.forEach(order => {
+                    const orderDate = new Date(order.created_at);
+                    if (orderDate >= lastWeekStart && orderDate < thisWeekStart) {
+                        lastWeekShopifyRevenue += parseFloat(order.total_price) || 0;
+                        lastWeekShopifyOrders++;
+                    }
+                });
+            }
             
-            // Get subscriber stats
+            // Calculate LAST WEEK's subscriber growth from history
+            // Find the count at the START of last week vs END of last week
+            const emailHistoryBeforeLastWeek = (analyticsData.history || [])
+                .filter(h => new Date(h.date) < lastWeekStart)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            const emailHistoryDuringLastWeek = (analyticsData.history || [])
+                .filter(h => new Date(h.date) >= lastWeekStart && new Date(h.date) < thisWeekStart)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const emailCountAtLastWeekStart = emailHistoryBeforeLastWeek.length > 0 
+                ? emailHistoryBeforeLastWeek[0].count 
+                : analyticsData.startCount || 0;
+            const emailCountAtLastWeekEnd = emailHistoryDuringLastWeek.length > 0
+                ? emailHistoryDuringLastWeek[0].count
+                : emailCountAtLastWeekStart;
+            const lastWeekEmailGrowth = emailCountAtLastWeekEnd - emailCountAtLastWeekStart;
+            
+            // Calculate LAST WEEK's paid subscriber growth
+            const paidHistoryBeforeLastWeek = (paidSubscriberData.history || [])
+                .filter(h => new Date(h.date) < lastWeekStart)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            const paidHistoryDuringLastWeek = (paidSubscriberData.history || [])
+                .filter(h => new Date(h.date) >= lastWeekStart && new Date(h.date) < thisWeekStart)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            const paidCountAtLastWeekStart = paidHistoryBeforeLastWeek.length > 0 
+                ? paidHistoryBeforeLastWeek[0].total 
+                : paidSubscriberData.startCount || 0;
+            const paidCountAtLastWeekEnd = paidHistoryDuringLastWeek.length > 0
+                ? paidHistoryDuringLastWeek[0].total
+                : paidCountAtLastWeekStart;
+            const lastWeekPaidGrowth = paidCountAtLastWeekEnd - paidCountAtLastWeekStart;
+            
+            // Current totals for context
             const emailSmsTotal = analyticsData.currentCount || 0;
             const paidSubsTotal = getTotalPaidSubscribers();
-            const paidSubsWeeklyGrowth = document.getElementById('paidWeeklyGrowth')?.textContent || '+0';
-            const emailWeeklyGrowth = document.getElementById('weeklyGrowth')?.textContent || '+0';
+            const monthlyRevenue = getMonthlyRevenue();
+            
+            // Format growth numbers
+            const emailWeeklyGrowth = (lastWeekEmailGrowth >= 0 ? '+' : '') + lastWeekEmailGrowth;
+            const paidSubsWeeklyGrowth = (lastWeekPaidGrowth >= 0 ? '+' : '') + lastWeekPaidGrowth;
+            
+            // Get priority to-dos from homepage (P1, P2, P3 items)
+            const priorityTodos = (todoData.items || [])
+                .filter(item => !item.completed && item.priority && item.priority <= 3)
+                .sort((a, b) => (a.priority || 4) - (b.priority || 4))
+                .slice(0, 3);
             
             // Get incomplete weekly tasks (top 3)
-            const incompleteTasks = tasks
-                .filter(t => t.frequency === 'weekly' && !isCompletedThisWeek(t))
+            const incompleteTasks = (tasks.weekly || [])
+                .filter(t => !isCompletedThisWeek(t))
                 .slice(0, 3);
             
             // Get monthly tasks suggestions
-            const monthlyTasks = tasks
-                .filter(t => t.frequency === 'monthly' && !isCompletedThisMonth(t))
+            const monthlyTasks = (tasks.monthly || [])
+                .filter(t => !isCompletedThisMonth(t))
                 .slice(0, 3);
             
             // Get quarterly tasks suggestions
-            const quarterlyTasks = tasks
-                .filter(t => t.frequency === 'quarterly')
+            const quarterlyTasks = (tasks.quarterly || [])
                 .slice(0, 3);
             
             // Sarcastic verdict
@@ -9157,7 +9213,7 @@
                 content += `
                     <div style="margin: 32px 0;">
                         <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
-                            📊 LAST WEEK BY THE NUMBERS
+                            📊 LAST WEEK'S NUMBERS
                         </h2>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 `;
@@ -9166,8 +9222,8 @@
                     content += `
                         <div style="background: #1a1a1a; padding: 16px; text-align: center;">
                             <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0;">🛒 Shopify Sales</p>
-                            <p style="color: #22c55e; font-size: 24px; font-weight: 700; margin: 0;">\$${shopifyWeekRevenue.toFixed(0)}</p>
-                            <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">${shopifyWeekOrders} orders</p>
+                            <p style="color: #22c55e; font-size: 24px; font-weight: 700; margin: 0;">\$${lastWeekShopifyRevenue.toFixed(0)}</p>
+                            <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">${lastWeekShopifyOrders} orders last week</p>
                         </div>
                     `;
                 }
@@ -9196,7 +9252,7 @@
                     content += `
                         <div style="background: #1a1a1a; padding: 16px; text-align: center;">
                             <p style="color: #666; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0;">💰 Sub Revenue</p>
-                            <p style="color: #22c55e; font-size: 24px; font-weight: 700; margin: 0;">\$${getMonthlyRevenue().toFixed(0)}</p>
+                            <p style="color: #22c55e; font-size: 24px; font-weight: 700; margin: 0;">\$${monthlyRevenue.toFixed(0)}</p>
                             <p style="color: #666; font-size: 12px; margin: 4px 0 0 0;">monthly recurring</p>
                         </div>
                     `;
@@ -9204,6 +9260,27 @@
                 
                 content += `
                         </div>
+                    </div>
+                `;
+            }
+            
+            // Priority To-Dos from homepage
+            if (priorityTodos.length > 0) {
+                const priorityColors = { 1: '#ef4444', 2: '#f97316', 3: '#3b82f6' };
+                const priorityLabels = { 1: 'P1', 2: 'P2', 3: 'P3' };
+                const todoHtml = priorityTodos.map(t => `
+                    <div style="background: #1a1a1a; border-left: 3px solid ${priorityColors[t.priority] || '#ef4444'}; padding: 12px 16px; margin-bottom: 8px;">
+                        <span style="color: #ffffff; font-weight: 500;">${t.title}</span>
+                        <span style="color: ${priorityColors[t.priority] || '#ef4444'}; font-size: 12px; margin-left: 8px;">${priorityLabels[t.priority] || 'P1'}</span>
+                    </div>
+                `).join('');
+                
+                content += `
+                    <div style="margin-bottom: 32px;">
+                        <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                            🔥 PRIORITY TO-DOS
+                        </h2>
+                        ${todoHtml}
                     </div>
                 `;
             }
@@ -9220,7 +9297,7 @@
                 content += `
                     <div style="margin-bottom: 32px;">
                         <h2 style="color: #d4af37; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; border-bottom: 1px solid #333; padding-bottom: 8px;">
-                            ⚡ THIS WEEK'S PRIORITIES
+                            ⚡ THIS WEEK'S TASKS
                         </h2>
                         ${weeklyHtml}
                     </div>
@@ -9470,42 +9547,6 @@
             const failed = results.filter(r => r.status === 'rejected').length;
             
             return { successful, failed, total: emails.length };
-        }
-
-        function checkAndSendScheduledEmail() {
-            const emails = parseEmails(notificationSettings.email);
-            if (notificationSettings.emailFrequency === 'off' || emails.length === 0) {
-                return;
-            }
-            
-            const now = new Date();
-            const lastSent = notificationSettings.lastEmailSent ? new Date(notificationSettings.lastEmailSent) : null;
-            
-            let shouldSend = false;
-            
-            if (notificationSettings.emailFrequency === 'daily') {
-                // Send if never sent or last sent was yesterday or earlier
-                if (!lastSent || now.toDateString() !== lastSent.toDateString()) {
-                    shouldSend = true;
-                }
-            } else if (notificationSettings.emailFrequency === 'weekly') {
-                // Send on Monday if not sent this week
-                const isMonday = now.getDay() === 1;
-                const thisWeekStart = getWeekStartDate(now);
-                if (isMonday && (!lastSent || lastSent < thisWeekStart)) {
-                    shouldSend = true;
-                }
-            }
-            
-            if (shouldSend) {
-                sendEmailToAll(false).then((result) => {
-                    notificationSettings.lastEmailSent = now.toISOString();
-                    saveNotificationSettings();
-                    console.log(`Scheduled emails sent: ${result.successful}/${result.total} successful`);
-                }).catch(error => {
-                    console.error('Failed to send scheduled emails:', error);
-                });
-            }
         }
 
         function getDueTasks() {
@@ -11453,6 +11494,7 @@
             yearRevenue: 0,
             allTimeOrders: 0,
             allTimeRevenue: 0,
+            recentOrders: [],
             lastUpdated: null
         };
         
@@ -11643,6 +11685,7 @@
                     yearRevenue: finalYearRevenue,
                     allTimeOrders,
                     allTimeRevenue,
+                    recentOrders: allOrders, // Store orders for email reports
                     lastUpdated: new Date().toISOString()
                 };
 
@@ -12940,9 +12983,6 @@
             updateStats();
             updateRecentlyCompleted();
             updateWeeklyProgress();
-            
-            // Check if we need to send scheduled email
-            checkAndSendScheduledEmail();
             
             // Check for Friday/Monday weekly emails
             checkAndSendWeeklyEmails();
