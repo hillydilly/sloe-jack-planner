@@ -7382,8 +7382,6 @@
         const notificationSettingsModal = document.getElementById('notificationSettingsModal');
         const closeNotificationSettings = document.getElementById('closeNotificationSettings');
         const saveNotificationSettingsBtn = document.getElementById('saveNotificationSettings');
-        const notificationTabs = document.querySelectorAll('.notification-tab');
-        const notificationList = document.getElementById('notificationList');
         const notificationEmail = document.getElementById('notificationEmail');
         const emailStatus = document.getElementById('emailStatus');
         const comingUpToggle = document.getElementById('comingUpToggle');
@@ -8465,6 +8463,7 @@
                 saveTasks();
                 renderCurrentView();
                 updateRecentlyCompleted();
+                updateWeeklyProgress();
             }
         }
 
@@ -8706,15 +8705,7 @@
             }
         });
 
-        // Notification tabs
-        notificationTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                notificationTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentNotificationTab = tab.dataset.tab;
-                renderNotificationList();
-            });
-        });
+        // Notification tabs - removed, old Due Now/Coming Up tabs no longer exist
 
         // Notification settings
         notificationSettingsBtn.addEventListener('click', (e) => {
@@ -9711,68 +9702,12 @@
             return upcoming;
         }
 
-        function renderNotificationList() {
-            if (currentNotificationTab === 'due') {
-                const dueTasks = getDueTasks();
-                
-                if (dueTasks.length === 0) {
-                    notificationList.innerHTML = `
-                        <div class="notification-empty">
-                            <div class="notification-empty-icon">✅</div>
-                            <p>No tasks due right now!<br>You're all caught up.</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                notificationList.innerHTML = dueTasks.map(task => `
-                    <div class="notification-item due">
-                        <div class="notification-icon ${task.frequency}">${task.icon}</div>
-                        <div class="notification-content">
-                            <div class="notification-title">${task.title}</div>
-                            <div class="notification-meta">
-                                <span class="notification-tag ${task.frequency}">${task.frequency}</span>
-                                <span class="notification-due-badge">${task.timeText}</span>
-                            </div>
-                        </div>
-                        <button class="notification-pin-btn" onclick="event.stopPropagation(); quickPinTask('${task.frequency}', ${task.id})" title="Pin to focus">📌</button>
-                    </div>
-                `).join('');
-            } else {
-                const upcoming = getUpcomingTasks();
-                
-                if (upcoming.length === 0) {
-                    notificationList.innerHTML = `
-                        <div class="notification-empty">
-                            <div class="notification-empty-icon">📋</div>
-                            <p>No upcoming tasks.<br>Add some tasks to get started!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                notificationList.innerHTML = upcoming.map(task => `
-                    <div class="notification-item" onclick="openTaskEditor('${task.frequency}')">
-                        <div class="notification-icon ${task.frequency}">${task.icon}</div>
-                        <div class="notification-content">
-                            <div class="notification-title">${task.title}</div>
-                            <div class="notification-meta">
-                                <span class="notification-tag ${task.frequency}">${task.frequency}</span>
-                                <span class="notification-tag ${task.urgency}">${task.timeText}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
         function quickPinTask(frequency, id) {
             const task = tasks[frequency].find(t => t.id === id);
             if (task) {
                 task.pinned = true;
                 saveTasks();
                 updateComingUp();
-                renderNotificationList();
             }
         }
 
@@ -9785,7 +9720,7 @@
             notificationBadge.textContent = dueCount;
             notificationBadge.style.display = dueCount > 0 ? 'flex' : 'none';
             
-            renderNotificationList();
+            // Note: renderNotificationList removed - old Due Now/Coming Up tabs no longer exist
         }
 
         function saveNotificationSettings() {
@@ -10033,9 +9968,11 @@
         function checkAndResetPinnedCompletions() {
             const now = new Date();
             
-            // Check weekly reset (Sunday)
+            // Check weekly reset (Monday)
             const weekStart = getWeekStartDate(now).toDateString();
+            console.log('checkAndResetPinnedCompletions - weekStart:', weekStart, 'lastPinnedResetDates.weekly:', lastPinnedResetDates.weekly);
             if (lastPinnedResetDates.weekly !== weekStart) {
+                console.log('RESETTING weekly pinnedCompletions because dates dont match');
                 pinnedCompletions.weekly = [];
                 lastPinnedResetDates.weekly = weekStart;
             }
@@ -10043,6 +9980,7 @@
             // Check monthly reset (1st of month)
             const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
             if (lastPinnedResetDates.monthly !== monthKey) {
+                console.log('RESETTING monthly pinnedCompletions');
                 pinnedCompletions.monthly = [];
                 lastPinnedResetDates.monthly = monthKey;
             }
@@ -10051,6 +9989,7 @@
             const quarter = Math.floor(now.getMonth() / 3);
             const quarterKey = `${now.getFullYear()}-Q${quarter}`;
             if (lastPinnedResetDates.quarterly !== quarterKey) {
+                console.log('RESETTING quarterly pinnedCompletions');
                 pinnedCompletions.quarterly = [];
                 lastPinnedResetDates.quarterly = quarterKey;
             }
@@ -10058,6 +9997,7 @@
             // Check yearly reset
             const yearKey = `${now.getFullYear()}`;
             if (lastPinnedResetDates.yearly !== yearKey) {
+                console.log('RESETTING yearly pinnedCompletions');
                 pinnedCompletions.yearly = [];
                 lastPinnedResetDates.yearly = yearKey;
             }
@@ -10337,11 +10277,27 @@
                     if (doc.exists) {
                         pinnedCompletions = doc.data().completions || { weekly: [], monthly: [], quarterly: [], yearly: [] };
                         lastPinnedResetDates = doc.data().resetDates || { weekly: null, monthly: null, quarterly: null, yearly: null };
+                        console.log('Loaded pinnedCompletions:', JSON.stringify(pinnedCompletions));
+                        console.log('Loaded lastPinnedResetDates:', JSON.stringify(lastPinnedResetDates));
+                    } else {
+                        console.log('No pinnedCompletions doc exists in Firebase');
                     }
                 })
                 .catch(error => {
                     console.error("Error loading pinned completions:", error);
                 });
+        }
+
+        function listenForPinnedCompletionsUpdates() {
+            db.collection('planner').doc('pinnedCompletions').onSnapshot(doc => {
+                if (doc.exists) {
+                    pinnedCompletions = doc.data().completions || { weekly: [], monthly: [], quarterly: [], yearly: [] };
+                    lastPinnedResetDates = doc.data().resetDates || { weekly: null, monthly: null, quarterly: null, yearly: null };
+                    renderFrequencyPinnedTasks();
+                }
+            }, error => {
+                console.error("Error listening to pinned completions updates:", error);
+            });
         }
 
         function updateComingUp() {
@@ -11378,6 +11334,7 @@
                 if (doc.exists) {
                     completionHistory = doc.data().history || [];
                     updateRecentlyCompleted();
+                    updateWeeklyProgress();
                 }
             }, error => {
                 console.error("Error listening to completion history updates:", error);
@@ -12979,6 +12936,7 @@
             renderTodoList();
             renderAnalytics();
             renderShopifyStats();
+            renderFrequencyPinnedTasks();
             updateComingUp();
             updateStats();
             updateRecentlyCompleted();
@@ -12992,6 +12950,7 @@
             listenForPriorityUpdates();
             listenForCategoryUpdates();
             listenForCompletionHistoryUpdates();
+            listenForPinnedCompletionsUpdates();
         }
 
         init();
