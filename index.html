@@ -7333,6 +7333,9 @@
             mondayIncludeWeeklyTasks: true,
             mondayIncludeMonthlyTasks: true,
             mondayIncludeQuarterlyTasks: true,
+            // Email tracking
+            lastFridayEmail: null,
+            lastMondayEmail: null,
             // Legacy (keep for compatibility)
             weekly: 2,
             monthly: 7,
@@ -9358,26 +9361,43 @@
             const hour = now.getHours();
             
             const emails = parseEmails(notificationSettings.email);
-            if (emails.length === 0) return;
+            console.log('checkAndSendWeeklyEmails - Day:', dayOfWeek, '(5=Fri, 1=Mon), Hour:', hour, ', Emails configured:', emails.length);
             
-            const lastFridayEmail = localStorage.getItem('lastFridayEmail');
-            const lastMondayEmail = localStorage.getItem('lastMondayEmail');
+            if (emails.length === 0) {
+                console.log('No emails configured, skipping weekly email check');
+                return;
+            }
+            
             const today = now.toDateString();
             
+            console.log('Friday enabled:', notificationSettings.fridayEnabled !== false, ', Last Friday email:', notificationSettings.lastFridayEmail, ', Today:', today);
+            console.log('Monday enabled:', notificationSettings.mondayEnabled !== false, ', Last Monday email:', notificationSettings.lastMondayEmail);
+            
             // Friday 5PM CT - only if enabled
-            if (notificationSettings.fridayEnabled !== false && dayOfWeek === 5 && hour >= 17 && lastFridayEmail !== today) {
-                console.log('Sending Friday progress email...');
-                emails.forEach(email => sendFridayProgressEmail(email));
-                localStorage.setItem('lastFridayEmail', today);
+            if (notificationSettings.fridayEnabled !== false && dayOfWeek === 5 && hour >= 17 && notificationSettings.lastFridayEmail !== today) {
+                console.log('🚀 Sending Friday progress email...');
+                emails.forEach(email => sendFridayProgressEmail(email)
+                    .then(() => console.log('✅ Friday email sent to', email))
+                    .catch(e => console.error('❌ Friday email failed:', e))
+                );
+                notificationSettings.lastFridayEmail = today;
+                saveNotificationSettings();
             }
             
             // Monday 10AM CT - only if enabled
-            if (notificationSettings.mondayEnabled !== false && dayOfWeek === 1 && hour >= 10 && lastMondayEmail !== today) {
-                console.log('Sending Monday recap email...');
-                emails.forEach(email => sendMondayRecapEmail(email));
-                localStorage.setItem('lastMondayEmail', today);
+            if (notificationSettings.mondayEnabled !== false && dayOfWeek === 1 && hour >= 10 && notificationSettings.lastMondayEmail !== today) {
+                console.log('🚀 Sending Monday recap email...');
+                emails.forEach(email => sendMondayRecapEmail(email)
+                    .then(() => console.log('✅ Monday email sent to', email))
+                    .catch(e => console.error('❌ Monday email failed:', e))
+                );
+                notificationSettings.lastMondayEmail = today;
+                saveNotificationSettings();
             }
         }
+        
+        // Check for emails every 5 minutes while page is open
+        setInterval(checkAndSendWeeklyEmails, 5 * 60 * 1000);
 
         // Manual email trigger functions (call from console)
         window.sendMondayRecap = function() {
