@@ -11541,61 +11541,96 @@
                     return;
                 }
             }
+            
+            console.log('🛒 Shopify: Token loaded, fetching orders...');
 
             if (statusEl) {
                 statusEl.className = 'shopify-status loading';
                 statusEl.querySelector('.shopify-status-text').textContent = 'Loading data...';
             }
 
+            // List of CORS proxies to try
+            const corsProxies = [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://cors-anywhere.herokuapp.com/'
+            ];
+
             try {
-                const proxyUrl = 'https://corsproxy.io/?';
                 let allOrders = [];
                 let sinceId = 0;
                 let hasMore = true;
                 let pageCount = 0;
+                let proxyWorked = false;
                 
-                // Paginate through all orders using since_id
-                while (hasMore && pageCount < 20) { // Max 20 pages (5000 orders) as safety limit
-                    pageCount++;
+                // Try each proxy until one works
+                for (const proxyUrl of corsProxies) {
+                    if (proxyWorked) break;
                     
-                    let shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250&order=id asc`;
+                    console.log(`🛒 Trying CORS proxy: ${proxyUrl.substring(0, 30)}...`);
+                    allOrders = [];
+                    sinceId = 0;
+                    hasMore = true;
+                    pageCount = 0;
                     
-                    if (sinceId > 0) {
-                        shopifyUrl += `&since_id=${sinceId}`;
-                    }
-                    
-                    if (statusEl) {
-                        statusEl.querySelector('.shopify-status-text').textContent = `Loading page ${pageCount}...`;
-                    }
-                    
-                    const response = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
-                        headers: {
-                            'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken
+                    try {
+                        // Paginate through all orders using since_id
+                        while (hasMore && pageCount < 20) { // Max 20 pages (5000 orders) as safety limit
+                            pageCount++;
+                            
+                            let shopifyUrl = `https://${SHOPIFY_CONFIG.shop}/admin/api/${SHOPIFY_CONFIG.apiVersion}/orders.json?status=any&limit=250&order=id asc`;
+                            
+                            if (sinceId > 0) {
+                                shopifyUrl += `&since_id=${sinceId}`;
+                            }
+                            
+                            if (statusEl) {
+                                statusEl.querySelector('.shopify-status-text').textContent = `Loading page ${pageCount}...`;
+                            }
+                            
+                            const response = await fetch(proxyUrl + encodeURIComponent(shopifyUrl), {
+                                headers: {
+                                    'X-Shopify-Access-Token': SHOPIFY_CONFIG.accessToken
+                                }
+                            });
+
+                            if (!response.ok) {
+                                console.error(`🛒 Proxy failed with HTTP ${response.status}`);
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            const orders = data.orders || [];
+                            
+                            if (orders.length === 0) {
+                                hasMore = false;
+                            } else {
+                                allOrders = allOrders.concat(orders);
+                                // Get the last order's ID for next page
+                                sinceId = orders[orders.length - 1].id;
+                                
+                                // If we got fewer than 250, we're on the last page
+                                if (orders.length < 250) {
+                                    hasMore = false;
+                                }
+                            }
                         }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    const orders = data.orders || [];
-                    
-                    if (orders.length === 0) {
-                        hasMore = false;
-                    } else {
-                        allOrders = allOrders.concat(orders);
-                        // Get the last order's ID for next page
-                        sinceId = orders[orders.length - 1].id;
                         
-                        // If we got fewer than 250, we're on the last page
-                        if (orders.length < 250) {
-                            hasMore = false;
-                        }
+                        // If we got here without error, this proxy worked
+                        proxyWorked = true;
+                        console.log(`✅ Proxy worked! Fetched ${allOrders.length} orders`);
+                        
+                    } catch (proxyError) {
+                        console.error(`❌ Proxy ${proxyUrl.substring(0, 30)} failed:`, proxyError.message);
+                        continue; // Try next proxy
                     }
                 }
                 
-                console.log(`Fetched ${allOrders.length} total orders`);
+                if (!proxyWorked) {
+                    throw new Error('All CORS proxies failed');
+                }
+                
+                console.log(`🛒 Fetched ${allOrders.length} total orders`);
 
                 // Calculate stats
                 const now = new Date();
